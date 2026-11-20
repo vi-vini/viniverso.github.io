@@ -207,6 +207,11 @@ body{margin:0;overflow:hidden}
 #jdesc.on{z-index:2}
 #jdesc .tp{margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.28);font:italic 500 12px/1.4 var(--wide);opacity:.85;letter-spacing:.02em}
 #jdesc .tp span{font-style:normal;font-weight:800;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;margin-right:6px;opacity:.75}
+#jcred{position:absolute;left:0;right:0;top:40%;transform:translateY(-50%);text-align:center;pointer-events:none;padding:0 max(16px,env(safe-area-inset-left,0px));opacity:0;transition:opacity .9s ease;z-index:3}
+#jcred.on{opacity:1}
+#jcred small{display:block;font:700 13px var(--wide);font-stretch:112%;letter-spacing:.18em;text-transform:uppercase;color:var(--sun);text-shadow:0 1px 8px rgba(0,0,0,.8)}
+#jcred b{display:block;margin-top:8px;font:800 clamp(30px,8vw,58px)/1 var(--wide);font-stretch:125%;letter-spacing:-.025em;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.75)}
+#jogo.creditos .hud,#jogo.creditos #jmode,#jogo.creditos #jcard{opacity:0!important;pointer-events:none}
 #jinicio{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;overflow:auto;padding:calc(28px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(180deg,rgba(26,10,5,.42) 0%,rgba(26,10,5,.8) 46%,rgba(26,10,5,.96) 100%);color:#fff;transition:opacity .8s ease}
 #jinicio.out{opacity:0;pointer-events:none}
 #jinicio[hidden]{display:none!important}
@@ -234,17 +239,18 @@ body{margin:0;overflow:hidden}
 <div id="jvig"></div>
 <div id="jfade"></div>
 <div id="jcard"><small id="jcs"></small><b id="jct"></b></div>
+<div id="jcred" role="status" aria-live="polite"><small></small><b></b></div>
 <div class="vbar hud"><div class="vtitle"><b>Quatro momentos da vida de Felipe Camarão</b><span id="jsub"></span></div></div>
 <nav class="jcenas hud" aria-label="Cenas" id="jcenas"></nav>
 <div class="vstatus" id="jstatus" role="status" aria-live="polite" hidden></div>
 <section id="jinicio" aria-labelledby="jit"><div class="ji">
 <small>Uma travessia em quatro cenas</small>
 <h1 id="jit"><span>Quatro momentos da vida de</span>Felipe Camarão</h1>
-<p class="d">Poti, “camarão” em tupi, foi uma liderança potiguara do século XVII. Você atravessa quatro momentos da sua história, do ritual tupi à Batalha dos Guararapes. Para partir, junte as três partes da escultura: cabeça, tronco e pernas.</p>
+<p class="d">Poti, “camarão” em tupi, foi uma liderança potiguara do século XVII. Você atravessa quatro momentos da sua história, do ritual tupi à Batalha dos Guararapes.</p>
 <ol id="jicenas"></ol>
 <div class="ld" id="jild"><i><u id="jilb"></u></i><span id="jilp">Carregando a primeira cena…</span></div>
 <div class="btnrow" id="jibtn" hidden><button class="add" type="button" id="jgyro">Começar com giroscópio</button><button class="add view" type="button" id="jtouch">Começar com o dedo</button></div>
-<p class="cr" id="jicr">Esculturas digitais de Vinícius Fernandes. Música: <i>Uirapuru</i>, de Heitor Villa-Lobos. <span id="jicomo">Olhe ao redor movendo o celular ou arrastando o dedo.</span></p>
+<p class="cr" id="jicr">Um jogo de Vinícius Fernandes. Música: <i>Uirapuru</i>, de Heitor Villa-Lobos. <span id="jicomo">Olhe ao redor movendo o celular ou arrastando o dedo.</span></p>
 </div></section>
 <p class="vinfo hud" id="jmode"></p>
 <div id="jhint" role="status" aria-live="polite"></div>
@@ -306,12 +312,12 @@ const setMode=t=>{mode.textContent=t};
 const P=new THREE.Vector3(),P2=new THREE.Vector3();
 function pointAt(pts,uu,closed,out){const n=pts.length;let f=Math.min(Math.max(uu,0),1)*(closed?n:n-1);let i=Math.floor(f);const t=f-i;if(closed){i%=n;const a=pts[i],b=pts[(i+1)%n];return out.set(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t)}i=Math.min(n-2,i);const a=pts[i],b=pts[i+1];return out.set(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t)}
 const route=()=>DATA&&ci>=0?DATA.cenas[ci].rotas[ri]:null;
-function prepRoute(r){if(r.prep)return;r.prep=1;r.stub=r.comp<1.5;r.dur=r.stub?16:Math.min(48,Math.max(11,r.comp/1.3));if(r.spline==="Spline Caju")r.dur=NUCLEO1_DUR;if(r.spline==="Spline Intro")r.dur=INTRO_DUR;
+function prepRoute(r){if(r.prep)return;r.prep=1;r.stub=r.comp<1.5;r.dur=r.stub?16:Math.min(48,Math.max(11,r.comp/1.3));if(r.spline==="Spline Caju")r.dur=NUCLEO1_DUR;if(MONTA_ATIVA&&r.spline==="Spline Intro")r.dur=INTRO_DUR;
  let cx=0,cz=0;r.pts.forEach(p=>{cx+=p[0];cz+=p[2]});r.cx=cx/r.pts.length;r.cz=cz/r.pts.length}
 function showCard(sub,t){$("#jcs").textContent=sub;$("#jct").textContent=t;card.classList.add("on");clearTimeout(showCard.t);showCard.t=setTimeout(()=>card.classList.remove("on"),3000)}
 function labelRoute(){const c=DATA.cenas[ci],r=route();title.textContent=c.sub.replace("Cena ","")+"."+(ri+1)+" · "+r.nome;$("#jsub").textContent=c.sub+" · "+c.titulo;document.querySelectorAll("#jcenas button").forEach((b,i)=>b.setAttribute("aria-current",String(i===ci)))}
 function startRoute(i,fresh){const c=DATA.cenas[ci];ri=(i+c.rotas.length)%c.rotas.length;const r=c.rotas[ri];prepRoute(r);tR=0;durR=r.dur;if(fresh){dragYaw=0;dragPitch=0}
- setObj();holdT=caju?(ci===0&&ri===1?NUCLEO1_PAUSA:PAUSA_CAJU):0;if(!holdT)foc=0;gid=null;grabbed=false;if(ci===0&&ri===0)montaStart();else montaStop();labelRoute();request()}
+ setObj();holdT=caju?(ci===0&&ri===1?NUCLEO1_PAUSA:PAUSA_CAJU):0;if(!holdT)foc=0;gid=null;grabbed=false;if(MONTA_ATIVA&&ci===0&&ri===0)montaStart();else montaStop();bandejaStop();labelRoute();request()}
 let fading=false;
 function goRoute(i){if(fading||busy)return;if(i>=DATA.cenas[ci].rotas.length){return goScene((ci+1)%DATA.cenas.length,0)}if(i<0){return startRoute(DATA.cenas[ci].rotas.length-1,true)}
  fading=true;fade.classList.remove("off");setTimeout(()=>{startRoute(i,true);fade.classList.add("off");setTimeout(()=>{fading=false},650)},620)}
@@ -349,27 +355,27 @@ bSom.onclick=()=>{somOn=!somOn;bSom.setAttribute("aria-pressed",String(somOn));b
 let pid=null,px=0,py=0;
 function poke(){idleT=0;host.classList.remove("idle")}
 canvas.addEventListener("pointerdown",e=>{poke();
- if(montaDown(e))return;
+ if(montaDown(e)||bandejaDown(e))return;
  if(holdT>0&&objOn()&&hitCaju(e)){gid=e.pointerId;grabbed=true;if(caju.userData.onGrab)caju.userData.onGrab();gx=e.clientX;gy=e.clientY;cvx=cvy=0;canvas.classList.add("grab");try{canvas.setPointerCapture(gid)}catch(_){}request();return}
  pid=e.pointerId;px=e.clientX;py=e.clientY;try{canvas.setPointerCapture(pid)}catch(_){}});
 canvas.addEventListener("pointermove",e=>{
- if(montaMove(e))return;
+ if(montaMove(e)||bandejaMove(e))return;
  if(e.pointerId===gid){const dx=e.clientX-gx,dy=e.clientY-gy;gx=e.clientX;gy=e.clientY;spinCaju(dx*.011,dy*.011);cvx=dx*.011;cvy=dy*.011;request();return}
  if(e.pointerId!==pid)return;const k=.0045*(camera.fov/70);dragYaw+=(e.clientX-px)*k;if(!gyro)dragPitch=Math.max(-1.3,Math.min(1.3,dragPitch+(e.clientY-py)*k));px=e.clientX;py=e.clientY;request()});
-const up=e=>{montaUp(e);if(e.pointerId===pid)pid=null;if(e.pointerId===gid){gid=null;canvas.classList.remove("grab")}};canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",up);
+const up=e=>{montaUp(e);if(bandejaUp(e))grabbed=false;if(e.pointerId===pid)pid=null;if(e.pointerId===gid){gid=null;canvas.classList.remove("grab")}};canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",up);
 addEventListener("keydown",poke);host.addEventListener("pointermove",()=>{if(host.classList.contains("idle"))poke()});
 function request(){if(active&&ready&&!raf)raf=requestAnimationFrame(tick)}
 function tick(t){raf=0;if(!ready)return;const dt=Math.min(.1,(t-lastT)/1000||.016);T+=dt;
  idleT+=dt;if(idleT>4.5&&started)host.classList.add("idle");
  const r=route();
- if(playing&&started&&r&&!fading&&!busy){if(holdT>0){if(gid===null&&MONTA.st!==1&&!(MONTA.want&&MONTA.st===0))holdT=Math.max(0,holdT-dt)}else{tR+=speeds[si]*dt;if(tR>=durR)goRoute(ri+1)}}
+ if(playing&&started&&r&&!fading&&!busy){if(holdT>0){if(gid===null&&MONTA.st!==1&&!(MONTA.want&&MONTA.st===0)&&!(BAND.drag&&BAND.drag.c))holdT=Math.max(0,holdT-dt)}else{tR+=speeds[si]*dt;if(tR>=durR){if(ci===0&&ri===0&&BAND.st===0&&bandejaStart()){}else goRoute(ri+1)}}}
  foc+=((holdT>0&&objOn()?1:0)-foc)*Math.min(1,dt*(holdT>0?2.2:1.6));
- tickCaju(dt);tickMonta(dt);tickRain(dt);tickVida(dt);tickFum(dt);tickAldeia(dt);tickFrota();tickAves(dt);
+ tickCaju(dt);tickMonta(dt);tickBandeja(dt);tickRain(dt);tickVida(dt);tickFum(dt);tickAldeia(dt);tickFrota();tickAves(dt);
  bar.style.width=(Math.min(1,tR/durR)*100).toFixed(1)+"%";
- windU.uTime.value=T;tickSky(dt);applyCam();aimSun();updateTrees();updateOcc();renderer.render(scene,camera);if((caju&&caju.userData.float&&caju.visible)||(MONTA.G&&MONTA.G.visible)){objKey.position.copy(camera.position).add(_ok.set(-1.2,1.6,.6).applyQuaternion(camera.quaternion));renderer.autoClear=false;renderer.clearDepth();renderer.render(objScene,camera);renderer.autoClear=true}
+ windU.uTime.value=T;tickSky(dt);applyCam();aimSun();updateTrees();updateOcc();renderer.render(scene,camera);if((caju&&caju.userData.float&&caju.visible)||(MONTA.G&&MONTA.G.visible)||(BAND.G&&BAND.G.visible)){objKey.position.copy(camera.position).add(_ok.set(-1.2,1.6,.6).applyQuaternion(camera.quaternion));renderer.autoClear=false;renderer.clearDepth();renderer.render(objScene,camera);renderer.autoClear=true}
  if(lastT&&t-lastT<250){if(t-lastT>38){if(++slow>=30){slow=0;if(sun.castShadow){sun.castShadow=false;renderer.shadowMap.enabled=false;scene.traverse(o=>{if(o.material)o.material.needsUpdate=true})}else if(pr>.75){pr=Math.max(.75,pr-.25);renderer.setPixelRatio(pr);size()}}}else slow=Math.max(0,slow-1)}
  lastT=t;request()}
-function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.fov=camera.aspect<1?82:68;camera.updateProjectionMatrix();if(MONTA.st===1)montaLayout(false);request()}
+function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.fov=camera.aspect<1?82:68;camera.updateProjectionMatrix();if(MONTA.st===1)montaLayout(false);if(BAND.st===1)bandejaFit();request()}
 new ResizeObserver(size).observe(host);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){lastT=0;request();if(gyro)wakeOn()}syncSom()});
 canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();if(QUAL==="alta"&&DATA&&DATA.cenas.some(c=>c.hd&&c.hd.length)){try{localStorage.setItem("qm.qual","leve")}catch(_){}jstatus("A resolução original passou do limite da placa de vídeo deste aparelho. Voltando para a versão leve…");setTimeout(()=>{location.href=location.pathname+"?q=leve"},1800);return}jstatus("O aparelho pausou o gráfico 3D. Volte para esta tela para continuar.")});
@@ -382,7 +388,11 @@ bGy.onclick=async()=>{if(gyro){gyroOff();dragYaw=0;dragPitch=0;setMode("Modo toq
 bPlay.onclick=()=>{playing=!playing;bPlay.textContent=playing?"Pausar":"Continuar";bPlay.setAttribute("aria-pressed",String(playing));request()};
 $("#jprev").onclick=()=>goRoute(ri-1);$("#jnext").onclick=()=>goRoute(ri+1);
 bSp.onclick=()=>{si=(si+1)%speeds.length;bSp.textContent="Velocidade "+["0,6","1","2"][si]+"×"};
-function begin(){started=true;try{if(host.requestFullscreen)host.requestFullscreen({navigationUI:"hide"}).catch(()=>{})}catch(e){}wakeOn();poke();syncSom()}
+const CREDITOS=[["Um jogo de","Vinícius Fernandes"],["Direção de arte","Vinícius Fernandes"],["Ajuda na programação","Ellison"],["Pesquisa histórica","Vinícius Fernandes"]];
+function creditos(){const el=$("#jcred"),sm=el.querySelector("small"),nm=el.querySelector("b");let i=0;host.classList.add("creditos");
+ const prox=()=>{el.classList.remove("on");if(i>=CREDITOS.length){setTimeout(()=>{host.classList.remove("creditos");if(DATA&&ci>=0)showCard(DATA.cenas[ci].sub,DATA.cenas[ci].titulo)},950);return}
+  const [a,b]=CREDITOS[i++];setTimeout(()=>{sm.textContent=a;nm.textContent=b;el.classList.add("on");setTimeout(prox,2600)},i===1?500:950)};prox()}
+function begin(){started=true;creditos();try{if(host.requestFullscreen)host.requestFullscreen({navigationUI:"hide"}).catch(()=>{})}catch(e){}wakeOn();poke();syncSom()}
 function fecharInicio(){host.classList.remove("inicio");const el=$("#jinicio");el.classList.add("out");setTimeout(()=>{el.hidden=true},820)}
 if(!MOBILE){$("#jgyro").hidden=true;$("#jtouch").textContent="Começar";$("#jtouch").className="add";$("#jicomo").textContent="Olhe ao redor arrastando com o mouse."}
 $("#jgyro").onclick=async()=>{begin();fecharInicio();await gyroOn();request()};
@@ -1245,6 +1255,7 @@ function tum(){try{audioC=audioC||new (window.AudioContext||window.webkitAudioCo
 // as três partes da escultura "felipe-camarao-3print" (em partes) flutuam espalhadas à frente da câmera;
 // arraste cada uma até a silhueta. A viagem só segue para o próximo núcleo depois de montado.
 const INTRO_DUR=42;
+const MONTA_ATIVA=false;   // montagem de Felipe Camarão guardada por enquanto (ligar = true)
 const MONTA={st:0,G:null,fig:null,parts:[],placed:0,drag:null,t:0,want:false,loaded:null,out:0};
 const MONTA_INFO={titulo:"Felipe Camarão",pt:"Poti, “camarão” em tupi, foi uma liderança potiguara do século XVII. Agora inteiro, ele acompanha você pelos quatro momentos da sua vida.",tp:"Ereîupe? Pá, aîur. Poti, potiguara."};
 const MONTA_NOMES={cabeca:"a cabeça",tronco:"o tronco",perna:"as pernas"};
@@ -1304,6 +1315,87 @@ function tickMonta(dt){if(!MONTA.G||!MONTA.G.visible)return;MONTA.t+=dt;montaFol
  if(MONTA.st===1){t=MONTA.drag?"Leve "+MONTA_NOMES[MONTA.drag.p.k]+" até a silhueta":"Monte Felipe Camarão";sm=MONTA.drag?"Solte perto do lugar certo e a peça se encaixa":"Arraste a cabeça, o tronco e as pernas até a silhueta · "+MONTA.placed+" de 3"}
  if(t){const k=t+"|"+sm;if(k!==hintTxt){hintTxt=k;h.replaceChildren(document.createTextNode(t));const s2=document.createElement("small");s2.textContent=sm;h.append(s2);h.classList.add("on")}}
  else if(hintTxt.startsWith("Monte")||hintTxt.startsWith("Leve")){hintTxt="";h.classList.remove("on")}}
+// ---------- fim do núcleo 1 (Introdução): bandeja de cajus interativa por 10 s ----------
+// cajus maduros (amarelo, laranja e vermelho, com pintinhas, castanha cinza-esverdeada) empilhados num prato de barro claro.
+// Cada caju pode ser pego e arrastado; ao soltar, volta para o seu lugar. Arrastar o prato gira a bandeja.
+// O tempo (10 s) fica parado enquanto você segura um caju.
+const BAND_PAUSA=10;
+const BAND={st:0,G:null,T:null,cajus:[],drag:null,t:0,s:1,tilt:.58};
+const BAND_INFO={titulo:"Bandeja de cajus",pt:"Os cajus maduros chegam da colheita, do amarelo ao vermelho. Pegue um e veja de perto: a castanha nasce do lado de fora do fruto.",tp:"Akaîu oropyk."};
+const _bv=new THREE.Vector3(),_bv2=new THREE.Vector3(),_bq=new THREE.Quaternion(),_bpl=new THREE.Plane(),_bsph=new THREE.Sphere();
+function mkCajuB(k,matA,matN){
+ const rnd=(a,b)=>{const s=Math.sin(a*127.1+b*311.7+k*17.31)*43758.5453;return s-Math.floor(s)};
+ // fruto mais redondo e baixo, como os da foto de referência (altura ≈ largura)
+ const H=.3+rnd(1,2)*.07,fat=.98+rnd(3,4)*.14,inner=new THREE.Group(),g=new THREE.Group();
+ const prof=[[0,.016],[.02,.004],[.06,.0],[.11,.03],[.14,.08],[.155,.16],[.16,.28],[.157,.42],[.148,.56],[.135,.7],[.115,.82],[.09,.92],[.06,.98],[.03,1],[0,1.006]];
+ const sp=new THREE.SplineCurve(prof.map(([r,t])=>new THREE.Vector2(r*fat,t*H))),pts=sp.getPoints(44).map(p=>new THREE.Vector2(Math.max(0,p.x),p.y));
+ const ag=new THREE.LatheGeometry(pts,52),pos=ag.attributes.position,n=pos.count,col=new Float32Array(n*3),c=new THREE.Color();
+ const yel=new THREE.Color("#f3b33d"),org=new THREE.Color("#ec8b34"),red=new THREE.Color("#df553a"),frk=new THREE.Color("#9a5a30");
+ const base=rnd(5,6),blush=.15+Math.pow(rnd(7,8),.8)*.75,a0=rnd(9,1)*6.28;
+ for(let i=0;i<n;i++){let x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i);const t=Math.min(1,Math.max(0,y/H)),a=Math.atan2(z,x);
+  const lump=1+.03*Math.sin(a*3+t*5.1+k)+.02*Math.sin(a*5-t*9.3+1.7)+.014*Math.sin(a*2+t*13);x*=lump;z*=lump;x+=.03*t*t*H;pos.setXYZ(i,x,y,z);
+  c.copy(yel).lerp(org,Math.min(1,base*.8+(1-t)*.12));
+  const lado=Math.max(0,Math.cos(a-a0));c.lerp(red,Math.min(.8,blush*lado*(.55+.5*(1-t))));
+  if(rnd(Math.floor(a*15),Math.floor(t*22))>.9)c.lerp(frk,.35+rnd(i,2)*.25);
+  c.offsetHSL(0,0,(rnd(i,3)-.5)*.04);col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b}
+ ag.setAttribute("color",new THREE.BufferAttribute(col,3));ag.computeVertexNormals();
+ inner.add(new THREE.Mesh(ag,matA));
+ const L=.19*(.92+rnd(6,2)*.16),Rb=L/2/.95,ng=new THREE.SphereGeometry(1,32,22),np=ng.attributes.position,nc=new Float32Array(np.count*3),cc=new THREE.Color(),gA=new THREE.Color("#7a795c"),gB=new THREE.Color("#a09d86"),gC=new THREE.Color("#4b3d2a");
+ for(let i=0;i<np.count;i++){let x=np.getX(i),y=np.getY(i),z=np.getZ(i);const body=Math.pow(Math.max(0,1-x*x),.42);
+  let px=x*L/2,py=y*.068*(L/.19)*body,pz=z*.05*(L/.19)*body;if(py>0)py*=.55;py-=.012*Math.exp(-Math.pow(z*2.2,2))*Math.max(0,y)*(1-x*x);
+  const th=px/Rb,cx=Rb*Math.sin(th),cy=Rb*(1-Math.cos(th)),nx=-Math.sin(th),ny=Math.cos(th),bump=1+.035*Math.sin(x*17+z*11)+.025*Math.sin(y*13-x*7);
+  np.setXYZ(i,(cx+py*nx)*bump,(cy+py*ny)*bump,pz*bump);
+  const m=rnd(Math.floor(x*9)+40,Math.floor(z*9)+Math.floor(y*5));cc.copy(gA).lerp(gB,m*.75).lerp(gC,Math.max(0,-y)*.4+(1-body)*.35);
+  nc[i*3]=cc.r;nc[i*3+1]=cc.g;nc[i*3+2]=cc.b}
+ ng.setAttribute("color",new THREE.BufferAttribute(nc,3));ng.computeVertexNormals();
+ ng.translate(-Rb*Math.sin(-.95),-(Rb*(1-Math.cos(-.95))),0);
+ const nut=new THREE.Mesh(ng,matN);nut.rotation.set(0,.35+rnd(2,9)*2,-.95);nut.position.set(.01,.004,0);inner.add(nut);
+ // virado como na bandeja: castanha para cima, fruto apoiado no prato
+ inner.rotation.x=Math.PI;inner.position.y=H/2;g.add(inner);g.userData.H=H;return g}
+function buildBandeja(){
+ const G=new THREE.Group(),T=new THREE.Group();G.add(T);G.visible=false;objScene.add(G);BAND.G=G;BAND.T=T;
+ const prof=[[0,0],[.86,0],[.96,.035],[1.02,.08],[1.0,.095],[.94,.06],[.86,.034],[0,.034]].map(([r,y])=>new THREE.Vector2(r,y));
+ const pg=new THREE.LatheGeometry(prof,72);pg.computeVertexNormals();
+ T.add(new THREE.Mesh(pg,new THREE.MeshStandardMaterial({color:new THREE.Color("#eee5d8"),roughness:.42,metalness:0,side:THREE.DoubleSide})));
+ const matA=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.46,metalness:0,emissive:new THREE.Color(.035,.012,.003)});matA.color.setRGB(1.2,1.13,1.06);const matN=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.68,metalness:0});
+ const vagas=[[0,0,0,0]];for(let i=0;i<8;i++){const a=i/8*6.283+.2;vagas.push([Math.cos(a)*.62,0,Math.sin(a)*.62,.14])}
+ for(let i=0;i<3;i++){const a=i/3*6.283+.9;vagas.push([Math.cos(a)*.29,.2,Math.sin(a)*.29,.34])}
+ vagas.forEach((v,k)=>{const cj=mkCajuB(k+1,matA,matN),H=cj.userData.H;
+  const casa=new THREE.Vector3(v[0],.034+H/2+v[1],v[2]),ang=Math.atan2(v[2],v[0]);
+  const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(0,Math.random()*6.28,0)).premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(-Math.sin(ang),0,Math.cos(ang)),-v[3]));
+  cj.position.copy(casa);cj.quaternion.copy(q);T.add(cj);BAND.cajus.push({g:cj,casa,q,ret:1,from:new THREE.Vector3(),fromQ:new THREE.Quaternion(),r:.19})})}
+function bandejaSom(f){try{audioC=audioC||new (window.AudioContext||window.webkitAudioContext)();const a=audioC,t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.55,t+.12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.2)}catch(_){}}
+function bandejaFit(){const D=1.35,halfH=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*D,halfW=halfH*camera.aspect;BAND.D=D;BAND.s=Math.min(.62,halfW*.78/1.05,halfH*.9/1.0)}
+function bandejaPose(dt,snap){const G=BAND.G;_bv.set(0,-.2*BAND.s,-BAND.D).applyQuaternion(camera.quaternion).add(camera.position);_bq.setFromAxisAngle(_bv2.set(1,0,0),BAND.tilt);_bq.premultiply(camera.quaternion);
+ const k=snap?1:1-Math.exp(-dt*3.5);G.position.lerp(_bv,k);G.quaternion.slerp(_bq,k)}
+function bandejaStart(){if(!BAND.G){try{buildBandeja()}catch(e){console.log("bandeja:",e.message);return false}}
+ BAND.st=1;BAND.t=0;BAND.drag=null;holdT=BAND_PAUSA;bandejaFit();BAND.G.scale.setScalar(.001);BAND.G.visible=true;applyCam();bandejaPose(0,true);
+ BAND.cajus.forEach(c=>{c.ret=1;c.g.position.copy(c.casa);c.g.quaternion.copy(c.q)});
+ const dsc=$("#jdesc");dsc.querySelector("b").textContent=BAND_INFO.titulo;dsc.querySelector("p").textContent=BAND_INFO.pt;dsc.querySelector(".tp").replaceChildren(Object.assign(document.createElement("span"),{textContent:"Tupi antigo"}),document.createTextNode(BAND_INFO.tp));
+ request();return true}
+function bandejaStop(){BAND.st=0;BAND.drag=null;if(BAND.G)BAND.G.visible=false;canvas.classList.remove("grab")}
+function bandejaDown(e){if(BAND.st!==1)return false;const ray=montaRay(e);BAND.G.updateMatrixWorld(true);let best=null,bd=1e9;
+ for(const c of BAND.cajus){c.g.getWorldPosition(_bsph.center);_bsph.radius=c.r*BAND.G.scale.x;if(ray.intersectSphere(_bsph,_bv)){const d=_bv.distanceTo(ray.origin);if(d<bd){bd=d;best=c}}}
+ if(best){const wp=best.g.getWorldPosition(new THREE.Vector3());camera.getWorldDirection(_bv2);_bpl.setFromNormalAndCoplanarPoint(_bv2,wp);const hit=ray.intersectPlane(_bpl,new THREE.Vector3());if(!hit)return false;
+  BAND.drag={c:best,id:e.pointerId,off:wp.sub(hit),plano:_bpl.clone()};best.ret=1;bandejaSom(560);grabbed=true}
+ else{BAND.T.getWorldPosition(_bv);_bv2.set(0,1,0).applyQuaternion(BAND.G.quaternion);_bpl.setFromNormalAndCoplanarPoint(_bv2,_bv);const hit=ray.intersectPlane(_bpl,new THREE.Vector3());
+  if(!hit||hit.distanceTo(_bv)>1.05*BAND.G.scale.x)return false;BAND.drag={prato:true,id:e.pointerId,x:e.clientX}}
+ canvas.classList.add("grab");try{canvas.setPointerCapture(e.pointerId)}catch(_){}poke();request();return true}
+function bandejaMove(e){const d=BAND.drag;if(!d||e.pointerId!==d.id)return false;
+ if(d.prato){BAND.T.rotation.y+=(e.clientX-d.x)*.012;d.x=e.clientX}
+ else{const hit=montaRay(e).intersectPlane(d.plano,_bv);if(hit){hit.add(d.off);BAND.T.worldToLocal(hit);d.c.g.position.copy(hit)}}
+ request();return true}
+function bandejaUp(e){const d=BAND.drag;if(!d||e.pointerId!==d.id)return false;BAND.drag=null;canvas.classList.remove("grab");
+ if(d.c){d.c.ret=0;d.c.from.copy(d.c.g.position);d.c.fromQ.copy(d.c.g.quaternion)}return true}
+function tickBandeja(dt){if(!BAND.G||!BAND.G.visible)return;BAND.t+=dt;bandejaPose(dt,false);
+ const alvo=BAND.st===1?BAND.s:0;BAND.G.scale.setScalar(Math.max(.001,BAND.G.scale.x+(alvo-BAND.G.scale.x)*Math.min(1,dt*6)));
+ for(const c of BAND.cajus){
+  if(BAND.drag&&BAND.drag.c===c){c.g.rotateY(dt*1.1);continue}
+  if(c.ret<1){c.ret=Math.min(1,c.ret+dt/.55);const e=1-Math.pow(1-c.ret,3);c.g.position.lerpVectors(c.from,c.casa,e);c.g.position.y+=Math.sin(c.ret*Math.PI)*.22;c.g.quaternion.slerpQuaternions(c.fromQ,c.q,e);
+   if(c.ret>=1){c.g.position.copy(c.casa);bandejaSom(300+Math.random()*80)}}}
+ const h=$("#jhint");let t="",sm="";
+ if(BAND.st===1){t=BAND.drag&&BAND.drag.c?"Solte o caju e ele volta para a bandeja":"Pegue um caju da bandeja";sm="A viagem continua em "+Math.max(1,Math.ceil(holdT))+" s"}
+ if(t){const k=t+"|"+sm;if(k!==hintTxt){hintTxt=k;h.replaceChildren(document.createTextNode(t));const s2=document.createElement("small");s2.textContent=sm;h.append(s2);h.classList.add("on")}}}
 const OBJS={
  1:{nome:"caju",titulo:"Colheita do caju",pt:"O caju maduro é apanhado do pé e levado à aldeia. Seu suco será preparado e fermentado no cauim, a bebida que dá corpo ao rito.",tp:"Akaîu oropyk, kaûĩ rã."},
  2:{nome:"caju mastigado",titulo:"Mascagem do caju",pt:"O caju é mastigado e devolvido às vasilhas: a saliva dá início à fermentação que transforma o suco em cauim.",tp:"akaîu (caju) · kaûĩ (cauim)",
@@ -1532,9 +1624,9 @@ function hitCaju(e){const r=canvas.getBoundingClientRect();_nd.set((e.clientX-r.
 function spinCaju(dx,dy){caju.rotateOnWorldAxis(Y,dx);_rx.set(1,0,0).applyQuaternion(camera.quaternion);caju.rotateOnWorldAxis(_rx,dy)}
 function tickCaju(dt){
  const h=$("#jhint"),dsc=$("#jdesc"),on=objOn();
- dsc.classList.toggle("on",(on&&grabbed&&holdT>0)||MONTA.st===2);
+ dsc.classList.toggle("on",(on&&grabbed&&holdT>0)||MONTA.st===2||(BAND.st===1&&grabbed));
  if(cajuTree&&cajuTree!==caju)cajuTree.rotateOnWorldAxis(Y,dt*.35);
- if(!caju){if(hintTxt&&!MONTA.st&&!MONTA.want){hintTxt="";h.classList.remove("on")}if(fillL&&cajuTree){fillL.position.copy(cajuTree.position);fillL.position.y+=.4}return}
+ if(!caju){if(hintTxt&&!MONTA.st&&!MONTA.want&&!BAND.st){hintTxt="";h.classList.remove("on")}if(fillL&&cajuTree){fillL.position.copy(cajuTree.position);fillL.position.y+=.4}return}
  const u=caju.userData;
  if(u.place){applyCam();const f=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);f.y=Math.max(-.25,Math.min(.15,f.y));f.normalize();caju.position.copy(camera.position).addScaledVector(f,1.2);caju.position.y-=.16;objKey.target.position.copy(caju.position);caju.rotation.set(.2,Math.atan2(f.x,f.z)+Math.PI+.5,0);u.place=false}
  if(u.float){const tgt=(holdT>0||gid!==null)?u.s:0,sc=caju.scale.x+(Math.max(.001,tgt)-caju.scale.x)*Math.min(1,dt*(tgt>0?5:3));caju.scale.setScalar(sc);caju.visible=sc>.01}
@@ -1566,7 +1658,7 @@ async function boot(){
  const lst=$("#jicenas");DATA.cenas.forEach((c,i)=>{const li=document.createElement("li"),b=document.createElement("b");b.textContent=String(i+1);li.append(b,document.createTextNode(c.titulo));lst.append(li)});
  const nav=$("#jcenas");DATA.cenas.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.textContent=String(i+1);b.title=c.sub+" · "+c.titulo;b.setAttribute("aria-label",c.sub+": "+c.titulo);b.onclick=()=>{if(i!==ci)goScene(i,0)};nav.append(b)});
  await goScene(0,0);$("#jild").hidden=true;$("#jibtn").hidden=false;try{$("#jibtn button:not([hidden])").focus({preventScroll:true})}catch(_){}}
-window.__jogo={get monta(){return MONTA},get rota(){return [ci,ri,+tR.toFixed(2),+holdT.toFixed(2),started]},montaProj(k){const p=MONTA.parts.find(q=>q.k===k);if(!p)return null;MONTA.G.updateMatrixWorld(true);const a=p.piv.getWorldPosition(new THREE.Vector3()).project(camera),b=MONTA.fig.localToWorld(p.home.clone()).project(camera),r=canvas.getBoundingClientRect();const f=v=>[r.left+(v.x+1)/2*r.width,r.top+(1-v.y)/2*r.height];return{de:f(a),para:f(b),placed:p.placed}},hEx:(x,z)=>hEx(x,z),scene,camera,renderer,get ready(){return ready},get ald(){return aldeia},get port(){return{oca,oca2,cajueiro,folhas:cajueiro&&cajueiro.userData.folhas,aldeia,regiao,treeGrp,cajuTree}},get aves(){return aves.map(a=>a.b.getWorldPosition(new THREE.Vector3()).toArray().map(v=>+v.toFixed(2)))},get cells(){return cellList.map(m=>{const b=m.userData.wb;return [b.min.toArray().map(Math.round),b.max.toArray().map(Math.round),m.geometry.index.count/3|0]})},jumpSky(){skyP=-1},probe(cx,cz,R,n){const rc=new THREE.Raycaster(),o=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=cx-R+2*R*i/(n-1),z=cz-R+2*R*j/(n-1);rc.set(new THREE.Vector3(x,-30,z),new THREE.Vector3(0,-1,0));const h=rc.intersectObjects(cellList,false);o.push([+x.toFixed(2),+z.toFixed(2),h.length?+h[0].point.y.toFixed(2):null,+hAt(x,z).toFixed(2)])}return o},pick(x,y){camera.updateMatrixWorld();const rc=new THREE.Raycaster();rc.setFromCamera(new THREE.Vector2(x,y),camera);const hs=rc.intersectObjects(cellList,false);return hs.length?[hs[0].point.toArray().map(v=>+v.toFixed(2)),hs[0].object.name]:null},set occ(v){OCC_ON=!!v;lastCP.set(1e9,0,0);lastTP.set(1e9,0,0)},go:(i,r)=>goScene(i,r),get caju(){return caju},get hold(){return holdT},info0:()=>0,get info(){return{ci,ri,tris:renderer.info.render.triangles,calls:renderer.info.render.calls,trees:treeSets.map(s=>s.N),occ:occStat,ald:aldeia?aldeia.children.length:-1,fog:fogos.length,cav:cavalo?cavalo.holder.position.toArray().map(v=>+v.toFixed(1)):null,owl:owls?owls.list.map(o=>[+o.x.toFixed(1),+o.y.toFixed(1),+o.z.toFixed(1)]):null,lz0:liz&&liz.list[0].ok?[liz.list[0].x,liz.list[0].z]:null,liz:liz?liz.list.filter(l=>l.ok).length:-1,fum:[fumAmt,!!fum,fum&&fum.visible,fum&&fum.material.uniforms.uC.value.toArray()]}}};
+window.__jogo={get band(){return BAND},bandejaJa(){tR=durR},bandProj(i){const c=BAND.cajus[i];BAND.G.updateMatrixWorld(true);const v=c.g.getWorldPosition(new THREE.Vector3()).project(camera),r=canvas.getBoundingClientRect();return[r.left+(v.x+1)/2*r.width,r.top+(1-v.y)/2*r.height]},get monta(){return MONTA},get rota(){return [ci,ri,+tR.toFixed(2),+holdT.toFixed(2),started]},montaProj(k){const p=MONTA.parts.find(q=>q.k===k);if(!p)return null;MONTA.G.updateMatrixWorld(true);const a=p.piv.getWorldPosition(new THREE.Vector3()).project(camera),b=MONTA.fig.localToWorld(p.home.clone()).project(camera),r=canvas.getBoundingClientRect();const f=v=>[r.left+(v.x+1)/2*r.width,r.top+(1-v.y)/2*r.height];return{de:f(a),para:f(b),placed:p.placed}},hEx:(x,z)=>hEx(x,z),scene,camera,renderer,get ready(){return ready},get ald(){return aldeia},get port(){return{oca,oca2,cajueiro,folhas:cajueiro&&cajueiro.userData.folhas,aldeia,regiao,treeGrp,cajuTree}},get aves(){return aves.map(a=>a.b.getWorldPosition(new THREE.Vector3()).toArray().map(v=>+v.toFixed(2)))},get cells(){return cellList.map(m=>{const b=m.userData.wb;return [b.min.toArray().map(Math.round),b.max.toArray().map(Math.round),m.geometry.index.count/3|0]})},jumpSky(){skyP=-1},probe(cx,cz,R,n){const rc=new THREE.Raycaster(),o=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=cx-R+2*R*i/(n-1),z=cz-R+2*R*j/(n-1);rc.set(new THREE.Vector3(x,-30,z),new THREE.Vector3(0,-1,0));const h=rc.intersectObjects(cellList,false);o.push([+x.toFixed(2),+z.toFixed(2),h.length?+h[0].point.y.toFixed(2):null,+hAt(x,z).toFixed(2)])}return o},pick(x,y){camera.updateMatrixWorld();const rc=new THREE.Raycaster();rc.setFromCamera(new THREE.Vector2(x,y),camera);const hs=rc.intersectObjects(cellList,false);return hs.length?[hs[0].point.toArray().map(v=>+v.toFixed(2)),hs[0].object.name]:null},set occ(v){OCC_ON=!!v;lastCP.set(1e9,0,0);lastTP.set(1e9,0,0)},go:(i,r)=>goScene(i,r),get caju(){return caju},get hold(){return holdT},info0:()=>0,get info(){return{ci,ri,tris:renderer.info.render.triangles,calls:renderer.info.render.calls,trees:treeSets.map(s=>s.N),occ:occStat,ald:aldeia?aldeia.children.length:-1,fog:fogos.length,cav:cavalo?cavalo.holder.position.toArray().map(v=>+v.toFixed(1)):null,owl:owls?owls.list.map(o=>[+o.x.toFixed(1),+o.y.toFixed(1),+o.z.toFixed(1)]):null,lz0:liz&&liz.list[0].ok?[liz.list[0].x,liz.list[0].z]:null,liz:liz?liz.list.filter(l=>l.ok).length:-1,fum:[fumAmt,!!fum,fum&&fum.visible,fum&&fum.material.uniforms.uC.value.toArray()]}}};
 boot();
 }
 </script>
