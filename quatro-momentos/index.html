@@ -207,8 +207,29 @@ body{margin:0;overflow:hidden}
 #jdesc.on{z-index:2}
 #jdesc .tp{margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.28);font:italic 500 12px/1.4 var(--wide);opacity:.85;letter-spacing:.02em}
 #jdesc .tp span{font-style:normal;font-weight:800;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;margin-right:6px;opacity:.75}
+#jinicio{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;overflow:auto;padding:calc(28px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(180deg,rgba(26,10,5,.42) 0%,rgba(26,10,5,.8) 46%,rgba(26,10,5,.96) 100%);color:#fff;transition:opacity .8s ease}
+#jinicio.out{opacity:0;pointer-events:none}
+#jinicio[hidden]{display:none!important}
+.ji{width:min(760px,100%);margin:auto 0}
+.ji>small{display:block;font:700 13px var(--wide);font-stretch:112%;letter-spacing:.16em;text-transform:uppercase;color:var(--sun)}
+.ji h1{margin:12px 0 0;font:800 clamp(36px,10vw,84px)/.92 var(--wide);font-stretch:125%;letter-spacing:-.03em;text-wrap:balance;text-shadow:0 2px 18px rgba(0,0,0,.45)}
+.ji h1 span{display:block;margin-bottom:.08em;font-weight:300;font-size:.62em;color:transparent;-webkit-text-stroke:1.2px #fff;text-shadow:none}
+.ji .d{margin:18px 0 0;max-width:52ch;font:500 15px/1.5 var(--wide);opacity:.92}
+.ji ol{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid rgba(255,255,255,.85)}
+.ji li{padding:10px 12px 0 0;font:700 13px/1.25 var(--wide);font-stretch:108%;min-width:0}
+.ji li b{display:block;font:800 22px/1.1 var(--wide);font-stretch:125%;color:var(--sun)}
+@media (max-width:560px){.ji ol{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:12px}.ji .d{font-size:14px}}
+.ji .ld{margin-top:24px;display:flex;align-items:center;gap:12px;font:600 13px var(--wide);opacity:.9}
+.ji .ld[hidden]{display:none}
+.ji .ld i{display:block;flex:0 1 260px;height:4px;background:rgba(255,255,255,.2);overflow:hidden}
+.ji .ld u{display:block;height:100%;width:4%;background:var(--sun);transition:width .25s}
+.ji .btnrow{margin-top:24px}
+.ji .btnrow .add{padding:12px 20px;font-size:15px;cursor:pointer}
+.ji .btnrow .add.view{color:#fff;border-color:#fff}
+#jogo.inicio .hud,#jogo.inicio #jhint,#jogo.inicio #jmode{opacity:0!important;pointer-events:none}
+.ji .cr{margin:24px 0 0;font:500 12px/1.5 var(--wide);opacity:.68;max-width:60ch}
 </style>
-<main id="jogo" aria-label="Quatro momentos da vida de Felipe Camarão">
+<main id="jogo" class="inicio" aria-label="Quatro momentos da vida de Felipe Camarão">
 <canvas id="stage3" tabindex="0" aria-label="Cena 3D. Aponte o celular ou arraste para olhar ao redor."></canvas>
 <div id="jvig"></div>
 <div id="jfade"></div>
@@ -216,10 +237,15 @@ body{margin:0;overflow:hidden}
 <div class="vbar hud"><div class="vtitle"><b>Quatro momentos da vida de Felipe Camarão</b><span id="jsub"></span></div></div>
 <nav class="jcenas hud" aria-label="Cenas" id="jcenas"></nav>
 <div class="vstatus" id="jstatus" role="status" aria-live="polite" hidden></div>
-<div class="vstatus ipanel" id="jpanel" hidden>
-<p><b>Entre no diorama.</b> Você é levado pelas quatro cenas, ao som do Uirapuru de Villa-Lobos, e olha ao redor movendo o celular. Sem giroscópio, arraste o dedo.</p>
-<div class="btnrow"><button class="add" type="button" id="jgyro">Entrar com giroscópio</button><button class="add view" type="button" id="jtouch">Entrar com o dedo</button></div>
-</div>
+<section id="jinicio" aria-labelledby="jit"><div class="ji">
+<small>Uma travessia em quatro cenas</small>
+<h1 id="jit"><span>Quatro momentos da vida de</span>Felipe Camarão</h1>
+<p class="d">Poti, “camarão” em tupi, foi uma liderança potiguara do século XVII. Você atravessa quatro momentos da sua história, do ritual tupi à Batalha dos Guararapes. Para partir, junte as três partes da escultura: cabeça, tronco e pernas.</p>
+<ol id="jicenas"></ol>
+<div class="ld" id="jild"><i><u id="jilb"></u></i><span id="jilp">Carregando a primeira cena…</span></div>
+<div class="btnrow" id="jibtn" hidden><button class="add" type="button" id="jgyro">Começar com giroscópio</button><button class="add view" type="button" id="jtouch">Começar com o dedo</button></div>
+<p class="cr" id="jicr">Esculturas digitais de Vinícius Fernandes. Música: <i>Uirapuru</i>, de Heitor Villa-Lobos. <span id="jicomo">Olhe ao redor movendo o celular ou arrastando o dedo.</span></p>
+</div></section>
 <p class="vinfo hud" id="jmode"></p>
 <div id="jhint" role="status" aria-live="polite"></div>
 <div id="jdesc" role="note" lang="pt-BR"><b>Colheita do caju</b><p>O caju maduro é apanhado do pé e levado à aldeia. Seu suco será preparado e fermentado no cauim, a bebida que dá corpo ao rito.</p><div class="tp" lang="tpw"><span>Tupi antigo</span>Akaîu oropyk, kaûĩ rã.</div></div>
@@ -280,12 +306,12 @@ const setMode=t=>{mode.textContent=t};
 const P=new THREE.Vector3(),P2=new THREE.Vector3();
 function pointAt(pts,uu,closed,out){const n=pts.length;let f=Math.min(Math.max(uu,0),1)*(closed?n:n-1);let i=Math.floor(f);const t=f-i;if(closed){i%=n;const a=pts[i],b=pts[(i+1)%n];return out.set(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t)}i=Math.min(n-2,i);const a=pts[i],b=pts[i+1];return out.set(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t)}
 const route=()=>DATA&&ci>=0?DATA.cenas[ci].rotas[ri]:null;
-function prepRoute(r){if(r.prep)return;r.prep=1;r.stub=r.comp<1.5;r.dur=r.stub?16:Math.min(48,Math.max(11,r.comp/1.3));
+function prepRoute(r){if(r.prep)return;r.prep=1;r.stub=r.comp<1.5;r.dur=r.stub?16:Math.min(48,Math.max(11,r.comp/1.3));if(r.spline==="Spline Caju")r.dur=NUCLEO1_DUR;if(r.spline==="Spline Intro")r.dur=INTRO_DUR;
  let cx=0,cz=0;r.pts.forEach(p=>{cx+=p[0];cz+=p[2]});r.cx=cx/r.pts.length;r.cz=cz/r.pts.length}
 function showCard(sub,t){$("#jcs").textContent=sub;$("#jct").textContent=t;card.classList.add("on");clearTimeout(showCard.t);showCard.t=setTimeout(()=>card.classList.remove("on"),3000)}
 function labelRoute(){const c=DATA.cenas[ci],r=route();title.textContent=c.sub.replace("Cena ","")+"."+(ri+1)+" · "+r.nome;$("#jsub").textContent=c.sub+" · "+c.titulo;document.querySelectorAll("#jcenas button").forEach((b,i)=>b.setAttribute("aria-current",String(i===ci)))}
 function startRoute(i,fresh){const c=DATA.cenas[ci];ri=(i+c.rotas.length)%c.rotas.length;const r=c.rotas[ri];prepRoute(r);tR=0;durR=r.dur;if(fresh){dragYaw=0;dragPitch=0}
- setObj();holdT=caju?PAUSA_CAJU:0;if(!holdT)foc=0;gid=null;grabbed=false;labelRoute();request()}
+ setObj();holdT=caju?(ci===0&&ri===1?NUCLEO1_PAUSA:PAUSA_CAJU):0;if(!holdT)foc=0;gid=null;grabbed=false;if(ci===0&&ri===0)montaStart();else montaStop();labelRoute();request()}
 let fading=false;
 function goRoute(i){if(fading||busy)return;if(i>=DATA.cenas[ci].rotas.length){return goScene((ci+1)%DATA.cenas.length,0)}if(i<0){return startRoute(DATA.cenas[ci].rotas.length-1,true)}
  fading=true;fade.classList.remove("off");setTimeout(()=>{startRoute(i,true);fade.classList.add("off");setTimeout(()=>{fading=false},650)},620)}
@@ -323,25 +349,27 @@ bSom.onclick=()=>{somOn=!somOn;bSom.setAttribute("aria-pressed",String(somOn));b
 let pid=null,px=0,py=0;
 function poke(){idleT=0;host.classList.remove("idle")}
 canvas.addEventListener("pointerdown",e=>{poke();
+ if(montaDown(e))return;
  if(holdT>0&&objOn()&&hitCaju(e)){gid=e.pointerId;grabbed=true;if(caju.userData.onGrab)caju.userData.onGrab();gx=e.clientX;gy=e.clientY;cvx=cvy=0;canvas.classList.add("grab");try{canvas.setPointerCapture(gid)}catch(_){}request();return}
  pid=e.pointerId;px=e.clientX;py=e.clientY;try{canvas.setPointerCapture(pid)}catch(_){}});
 canvas.addEventListener("pointermove",e=>{
+ if(montaMove(e))return;
  if(e.pointerId===gid){const dx=e.clientX-gx,dy=e.clientY-gy;gx=e.clientX;gy=e.clientY;spinCaju(dx*.011,dy*.011);cvx=dx*.011;cvy=dy*.011;request();return}
  if(e.pointerId!==pid)return;const k=.0045*(camera.fov/70);dragYaw+=(e.clientX-px)*k;if(!gyro)dragPitch=Math.max(-1.3,Math.min(1.3,dragPitch+(e.clientY-py)*k));px=e.clientX;py=e.clientY;request()});
-const up=e=>{if(e.pointerId===pid)pid=null;if(e.pointerId===gid){gid=null;canvas.classList.remove("grab")}};canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",up);
+const up=e=>{montaUp(e);if(e.pointerId===pid)pid=null;if(e.pointerId===gid){gid=null;canvas.classList.remove("grab")}};canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",up);
 addEventListener("keydown",poke);host.addEventListener("pointermove",()=>{if(host.classList.contains("idle"))poke()});
 function request(){if(active&&ready&&!raf)raf=requestAnimationFrame(tick)}
 function tick(t){raf=0;if(!ready)return;const dt=Math.min(.1,(t-lastT)/1000||.016);T+=dt;
  idleT+=dt;if(idleT>4.5&&started)host.classList.add("idle");
  const r=route();
- if(playing&&r&&!fading&&!busy){if(holdT>0){if(gid===null)holdT=Math.max(0,holdT-dt)}else{tR+=speeds[si]*dt;if(tR>=durR)goRoute(ri+1)}}
+ if(playing&&started&&r&&!fading&&!busy){if(holdT>0){if(gid===null&&MONTA.st!==1&&!(MONTA.want&&MONTA.st===0))holdT=Math.max(0,holdT-dt)}else{tR+=speeds[si]*dt;if(tR>=durR)goRoute(ri+1)}}
  foc+=((holdT>0&&objOn()?1:0)-foc)*Math.min(1,dt*(holdT>0?2.2:1.6));
- tickCaju(dt);tickRain(dt);tickVida(dt);tickFum(dt);tickAldeia(dt);tickFrota();tickAves(dt);
+ tickCaju(dt);tickMonta(dt);tickRain(dt);tickVida(dt);tickFum(dt);tickAldeia(dt);tickFrota();tickAves(dt);
  bar.style.width=(Math.min(1,tR/durR)*100).toFixed(1)+"%";
- windU.uTime.value=T;tickSky(dt);applyCam();aimSun();updateTrees();updateOcc();renderer.render(scene,camera);if(caju&&caju.userData.float&&caju.visible){objKey.position.copy(camera.position).add(_ok.set(-1.2,1.6,.6).applyQuaternion(camera.quaternion));renderer.autoClear=false;renderer.clearDepth();renderer.render(objScene,camera);renderer.autoClear=true}
+ windU.uTime.value=T;tickSky(dt);applyCam();aimSun();updateTrees();updateOcc();renderer.render(scene,camera);if((caju&&caju.userData.float&&caju.visible)||(MONTA.G&&MONTA.G.visible)){objKey.position.copy(camera.position).add(_ok.set(-1.2,1.6,.6).applyQuaternion(camera.quaternion));renderer.autoClear=false;renderer.clearDepth();renderer.render(objScene,camera);renderer.autoClear=true}
  if(lastT&&t-lastT<250){if(t-lastT>38){if(++slow>=30){slow=0;if(sun.castShadow){sun.castShadow=false;renderer.shadowMap.enabled=false;scene.traverse(o=>{if(o.material)o.material.needsUpdate=true})}else if(pr>.75){pr=Math.max(.75,pr-.25);renderer.setPixelRatio(pr);size()}}}else slow=Math.max(0,slow-1)}
  lastT=t;request()}
-function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.fov=camera.aspect<1?82:68;camera.updateProjectionMatrix();request()}
+function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.fov=camera.aspect<1?82:68;camera.updateProjectionMatrix();if(MONTA.st===1)montaLayout(false);request()}
 new ResizeObserver(size).observe(host);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){lastT=0;request();if(gyro)wakeOn()}syncSom()});
 canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();if(QUAL==="alta"&&DATA&&DATA.cenas.some(c=>c.hd&&c.hd.length)){try{localStorage.setItem("qm.qual","leve")}catch(_){}jstatus("A resolução original passou do limite da placa de vídeo deste aparelho. Voltando para a versão leve…");setTimeout(()=>{location.href=location.pathname+"?q=leve"},1800);return}jstatus("O aparelho pausou o gráfico 3D. Volte para esta tela para continuar.")});
@@ -355,8 +383,10 @@ bPlay.onclick=()=>{playing=!playing;bPlay.textContent=playing?"Pausar":"Continua
 $("#jprev").onclick=()=>goRoute(ri-1);$("#jnext").onclick=()=>goRoute(ri+1);
 bSp.onclick=()=>{si=(si+1)%speeds.length;bSp.textContent="Velocidade "+["0,6","1","2"][si]+"×"};
 function begin(){started=true;try{if(host.requestFullscreen)host.requestFullscreen({navigationUI:"hide"}).catch(()=>{})}catch(e){}wakeOn();poke();syncSom()}
-$("#jgyro").onclick=async()=>{begin();$("#jpanel").hidden=true;await gyroOn();request()};
-$("#jtouch").onclick=()=>{begin();$("#jpanel").hidden=true;setMode("Modo toque: arraste o dedo para olhar ao redor.");request()};
+function fecharInicio(){host.classList.remove("inicio");const el=$("#jinicio");el.classList.add("out");setTimeout(()=>{el.hidden=true},820)}
+if(!MOBILE){$("#jgyro").hidden=true;$("#jtouch").textContent="Começar";$("#jtouch").className="add";$("#jicomo").textContent="Olhe ao redor arrastando com o mouse."}
+$("#jgyro").onclick=async()=>{begin();fecharInicio();await gyroOn();request()};
+$("#jtouch").onclick=()=>{begin();fecharInicio();setMode(MOBILE?"Modo toque: arraste o dedo para olhar ao redor.":"Arraste com o mouse para olhar ao redor.");request()};
 
 // ---------- conteúdo ----------
 const hash=(x,z)=>{const s=Math.sin(x*127.1+z*311.7)*43758.5453;return s-Math.floor(s)};
@@ -1153,6 +1183,8 @@ function tickAldeia(dt){
 function freeAldeia(){aldGen++;fogos.length=0;fireLight=null;owls=null;liz=null;cavalo=null;if(aldeia){scene.remove(aldeia);aldeia.userData.dispose&&aldeia.userData.dispose();aldeia=null}}
 // ---------- caju interativo do trecho 1.2 (substitui o cubo do Unity) ----------
 const PAUSA_CAJU=5,CAJU_MODELO=true;
+// núcleo 1 (colheita do caju) mais demorado: percurso ~2,2× mais lento e pausa maior com o caju
+const NUCLEO1_DUR=24,NUCLEO1_PAUSA=8;
 const _ray=new THREE.Raycaster(),_nd=new THREE.Vector2(),_rx=new THREE.Vector3();
 function mkCaju(){
  const g=new THREE.Group(),inner=new THREE.Group(),H=.46,rnd=(a,b)=>{const s=Math.sin(a*127.1+b*311.7)*43758.5453;return s-Math.floor(s)};
@@ -1209,6 +1241,69 @@ function rippleDisc(g,fn){const p=g.attributes.position,b=g.userData.base;for(le
 function tum(){try{audioC=audioC||new (window.AudioContext||window.webkitAudioContext)();const a=audioC,t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.setValueAtTime(115,t);o.frequency.exponentialRampToValueAtTime(48,t+.35);
  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.9,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.6);o.connect(g).connect(a.destination);o.start(t);o.stop(t+.65);
  const n=a.createBuffer(1,a.sampleRate*.12,a.sampleRate),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);const s=a.createBufferSource(),f=a.createBiquadFilter(),g2=a.createGain();s.buffer=n;f.type="lowpass";f.frequency.value=900;g2.gain.value=.35;s.connect(f).connect(g2).connect(a.destination);s.start(t)}catch(_){}}
+// ---------- núcleo 1 (Introdução): montar Felipe Camarão — cabeça, tronco e pernas ----------
+// as três partes da escultura "felipe-camarao-3print" (em partes) flutuam espalhadas à frente da câmera;
+// arraste cada uma até a silhueta. A viagem só segue para o próximo núcleo depois de montado.
+const INTRO_DUR=42;
+const MONTA={st:0,G:null,fig:null,parts:[],placed:0,drag:null,t:0,want:false,loaded:null,out:0};
+const MONTA_INFO={titulo:"Felipe Camarão",pt:"Poti, “camarão” em tupi, foi uma liderança potiguara do século XVII. Agora inteiro, ele acompanha você pelos quatro momentos da sua vida.",tp:"Ereîupe? Pá, aîur. Poti, potiguara."};
+const MONTA_NOMES={cabeca:"a cabeça",tronco:"o tronco",perna:"as pernas"};
+const _mr=new THREE.Raycaster(),_mn=new THREE.Vector2(),_mp=new THREE.Plane(),_mv=new THREE.Vector3(),_mv2=new THREE.Vector3(),_mb=new THREE.Box3(),_mq=new THREE.Quaternion(),_mI=new THREE.Quaternion();
+function loadMonta(){if(!MONTA.loaded)MONTA.loaded=loadGLB("jogo/felipe-partes.glb.wasm",()=>{}).then(g=>{buildMonta(g.scene);return true}).catch(e=>{console.log("felipe:",e.message);return false});return MONTA.loaded}
+function f32(a,n){const o=new Float32Array(a.count*n);for(let i=0;i<a.count;i++){o[i*n]=a.getX(i);if(n>1)o[i*n+1]=a.getY(i);if(n>2)o[i*n+2]=a.getZ(i)}return o}
+function buildMonta(root){
+ root.updateMatrixWorld(true);const ms=[];root.traverse(o=>{if(o.isMesh)ms.push(o)});
+ const geos={};for(const m of ms){const g0=m.geometry,g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(f32(g0.attributes.position,3),3));g.setAttribute("normal",new THREE.BufferAttribute(f32(g0.attributes.normal,3),3));
+  const ca=g0.attributes.color,c=new Float32Array(ca.count*3);for(let i=0;i<ca.count;i++){c[i*3]=SL(ca.getX(i));c[i*3+1]=SL(ca.getY(i));c[i*3+2]=SL(ca.getZ(i))}
+  g.setAttribute("color",new THREE.BufferAttribute(c,3));g.setIndex(new THREE.BufferAttribute(Uint32Array.from(g0.index.array),1));g.applyMatrix4(m.matrixWorld);geos[m.name.replace(/_\d+$/,"")]=g}
+ const all=new THREE.Box3();Object.values(geos).forEach(g=>{g.computeBoundingBox();all.union(g.boundingBox)});
+ const H=1.42,s=H/(all.max.y-all.min.y),c=all.getCenter(new THREE.Vector3());
+ const G=new THREE.Group(),fig=new THREE.Group();G.add(fig);{const cv=document.createElement("canvas");cv.width=cv.height=128;const x=cv.getContext("2d"),gr=x.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,"rgba(20,8,3,.62)");gr.addColorStop(.55,"rgba(20,8,3,.4)");gr.addColorStop(1,"rgba(20,8,3,0)");x.fillStyle=gr;x.fillRect(0,0,128,128);const tx=new THREE.CanvasTexture(cv);tx.colorSpace=THREE.SRGBColorSpace;const bd=new THREE.Mesh(new THREE.PlaneGeometry(3.6,2.5),new THREE.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false,toneMapped:false}));bd.position.z=-.55;bd.renderOrder=-2;G.add(bd);MONTA.bd=bd}G.visible=false;objScene.add(G);MONTA.G=G;MONTA.fig=fig;
+ for(const k of ["perna","tronco","cabeca"]){const g=geos[k];if(!g)continue;g.translate(-c.x,-c.y,-c.z);g.scale(s,s,s);g.computeBoundingBox();
+  const home=g.boundingBox.getCenter(new THREE.Vector3());g.translate(-home.x,-home.y,-home.z);g.computeBoundingBox();g.computeBoundingSphere();
+  const mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,emissive:0xffb347,emissiveIntensity:0});
+  const piv=new THREE.Group(),mesh=new THREE.Mesh(g,mat);piv.add(mesh);fig.add(piv);
+  const gm=new THREE.MeshBasicMaterial({color:0xffc66e,transparent:true,opacity:.16,depthWrite:false}),ghost=new THREE.Mesh(g,gm);ghost.position.copy(home);ghost.renderOrder=-1;fig.add(ghost);
+  MONTA.parts.push({k,piv,mesh,ghost,home,q0:new THREE.Quaternion(),placed:false,snap:1,from:new THREE.Vector3(),fromQ:new THREE.Quaternion(),glow:0,bob:Math.random()*6.3})}}
+function montaLayout(reset){const D=2.0,halfH=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*D,halfW=halfH*camera.aspect,port=camera.aspect<.95;MONTA.D=D;MONTA.port=port;
+ let sc,spots,fy=0;
+ if(!port){sc=Math.min(1,halfW/1.4);const sx=Math.min(1.12,(halfW/sc)-.32);spots=[[-sx,.34],[sx,.06],[-sx*.9,-.38],[sx*.94,-.4]]}
+ else{sc=Math.min(1,halfW/.86);fy=.46;const sx=Math.min(.6,(halfW/sc)-.27);spots=[[-sx,-1.02],[0,-1.1],[sx,-1.02]]}
+ spots.sort(()=>Math.random()-.5);MONTA.G.scale.setScalar(sc);MONTA.fig.position.y=fy;let j=0;
+ MONTA.parts.forEach(p=>{if(reset){p.placed=false;p.snap=1;p.glow=0;p.ghost.visible=true;p.ghost.material.opacity=.16;p.mesh.material.emissiveIntensity=0;p.q0.setFromEuler(new THREE.Euler((Math.random()-.5)*.5,(Math.random()<.5?-1:1)*(.7+Math.random()*.9),(Math.random()-.5)*.45));p.piv.quaternion.copy(p.q0);p.piv.scale.setScalar(port?.72:1)}
+  if(p.placed||(MONTA.drag&&MONTA.drag.p===p))return;const sp=spots[j++];p.piv.position.set(sp[0],sp[1],.12+.08*Math.random())})}
+function montaFollow(dt,snap){const G=MONTA.G;_mv.set(0,-.06,-MONTA.D).applyQuaternion(camera.quaternion).add(camera.position);const k=snap?1:1-Math.exp(-dt*3.5);G.position.lerp(_mv,k);G.quaternion.slerp(camera.quaternion,k)}
+function montaStart(){if(!(ci===0&&ri===0))return;MONTA.want=true;holdT=1e6;loadMonta().then(ok=>{if(!MONTA.want||!(ci===0&&ri===0))return;if(!ok||!MONTA.parts.length){MONTA.want=false;holdT=0;return}
+ MONTA.placed=0;MONTA.drag=null;MONTA.t=0;MONTA.st=1;MONTA.out=0;MONTA.bd.material.opacity=1;MONTA.fig.rotation.set(0,0,0);MONTA.G.visible=true;montaLayout(true);applyCam();montaFollow(0,true);request()})}
+function montaStop(){MONTA.want=false;MONTA.st=0;MONTA.drag=null;if(MONTA.G)MONTA.G.visible=false;canvas.classList.remove("grab")}
+function montaRay(e){const r=canvas.getBoundingClientRect();_mn.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);camera.updateMatrixWorld();_mr.setFromCamera(_mn,camera);return _mr.ray}
+function montaDown(e){if(MONTA.st!==1)return false;const ray=montaRay(e);let best=null,bd=1e9;MONTA.G.updateMatrixWorld(true);
+ for(const p of MONTA.parts){if(p.placed)continue;_mb.copy(p.mesh.geometry.boundingBox).expandByScalar(.07).applyMatrix4(p.mesh.matrixWorld);if(ray.intersectBox(_mb,_mv)){const d=_mv.distanceTo(ray.origin);if(d<bd){bd=d;best=p}}}
+ if(!best)return false;const wp=best.piv.getWorldPosition(new THREE.Vector3());camera.getWorldDirection(_mv2);_mp.setFromNormalAndCoplanarPoint(_mv2,wp);
+ const hit=ray.intersectPlane(_mp,new THREE.Vector3());if(!hit)return false;MONTA.drag={p:best,id:e.pointerId,off:wp.sub(hit)};canvas.classList.add("grab");try{canvas.setPointerCapture(e.pointerId)}catch(_){}poke();request();return true}
+function montaMove(e){const d=MONTA.drag;if(!d||e.pointerId!==d.id)return false;const ray=montaRay(e),hit=ray.intersectPlane(_mp,_mv);if(hit){hit.add(d.off);MONTA.fig.worldToLocal(hit);d.p.piv.position.copy(hit);if(hit.distanceTo(d.p.home)<.07)montaPlace(d.p)}request();return true}
+function montaUp(e){const d=MONTA.drag;if(!d||e.pointerId!==d.id)return false;MONTA.drag=null;canvas.classList.remove("grab");if(!d.p.placed&&d.p.piv.position.distanceTo(d.p.home)<.24)montaPlace(d.p);return true}
+function montaPlace(p){if(p.placed)return;p.placed=true;p.snap=0;p.from.copy(p.piv.position);p.fromQ.copy(p.piv.quaternion);p.glow=1;p.ghost.visible=false;MONTA.placed++;if(MONTA.drag&&MONTA.drag.p===p){MONTA.drag=null;canvas.classList.remove("grab")}
+ montaSom(MONTA.placed);if(MONTA.placed>=MONTA.parts.length){MONTA.st=2;MONTA.t=0;holdT=5.5;const dsc=$("#jdesc");dsc.querySelector("b").textContent=MONTA_INFO.titulo;dsc.querySelector("p").textContent=MONTA_INFO.pt;dsc.querySelector(".tp").replaceChildren(Object.assign(document.createElement("span"),{textContent:"Tupi antigo"}),document.createTextNode(MONTA_INFO.tp))}}
+function montaSom(n){try{audioC=audioC||new (window.AudioContext||window.webkitAudioContext)();const a=audioC,t=a.currentTime,fs=n>=3?[196,247,294,392]:[[220],[262],[330]][Math.min(2,n-1)];
+ fs.forEach((f,i)=>{const o=a.createOscillator(),g=a.createGain(),t0=t+i*.07;o.type="triangle";o.frequency.setValueAtTime(f,t0);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.32,t0+.01);g.gain.exponentialRampToValueAtTime(.0001,t0+(n>=3?1.6:.5));o.connect(g).connect(a.destination);o.start(t0);o.stop(t0+1.7)})}catch(_){}}
+const easeBack=x=>{const c1=1.4,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+function tickMonta(dt){if(!MONTA.G||!MONTA.G.visible)return;MONTA.t+=dt;montaFollow(dt,false);
+ for(const p of MONTA.parts){
+  if(p.placed){if(p.snap<1){p.snap=Math.min(1,p.snap+dt/.38);const e=easeBack(p.snap);p.piv.position.lerpVectors(p.from,p.home,e);p.piv.quaternion.slerpQuaternions(p.fromQ,_mI,Math.min(1,e))}else{p.piv.position.copy(p.home);p.piv.quaternion.identity()}p.piv.scale.setScalar(p.piv.scale.x+(1-p.piv.scale.x)*Math.min(1,dt*8))}
+  else{const dragging=MONTA.drag&&MONTA.drag.p===p,dist=p.piv.position.distanceTo(p.home),k=Math.max(0,Math.min(1,1-(dist-.12)/.75));
+   _mq.copy(p.q0).slerp(_mI,dragging?k:k*.5);p.piv.quaternion.slerp(_mq,1-Math.exp(-dt*6));
+   {const ts=MONTA.port?.72+.28*k:1;p.piv.scale.setScalar(p.piv.scale.x+(ts-p.piv.scale.x)*(1-Math.exp(-dt*6)))}
+   if(!dragging){p.piv.position.y+=Math.sin(MONTA.t*1.3+p.bob)*.0006;p.piv.rotateY(Math.sin(MONTA.t*.7+p.bob)*.0015)}
+   p.ghost.material.opacity=.16+(dragging?.24*k:0)+.05*Math.sin(MONTA.t*2.4+p.bob)}
+  if(p.glow>0){p.glow=Math.max(0,p.glow-dt*1.4);p.mesh.material.emissiveIntensity=.55*p.glow}}
+ if(MONTA.st===2){MONTA.fig.rotation.y+=dt*.55;if(holdT<=0)MONTA.st=3}
+ if(MONTA.st===3){MONTA.out=Math.min(1,MONTA.out+dt/1.1);const s=1-MONTA.out;MONTA.fig.scale.setScalar(Math.max(.001,s*s*(3-2*s)));MONTA.bd.material.opacity=s;if(MONTA.out>=1){MONTA.st=0;MONTA.want=false;MONTA.G.visible=false;MONTA.fig.scale.setScalar(1)}}
+ const h=$("#jhint");let t="",sm="";
+ if(MONTA.st===1){t=MONTA.drag?"Leve "+MONTA_NOMES[MONTA.drag.p.k]+" até a silhueta":"Monte Felipe Camarão";sm=MONTA.drag?"Solte perto do lugar certo e a peça se encaixa":"Arraste a cabeça, o tronco e as pernas até a silhueta · "+MONTA.placed+" de 3"}
+ if(t){const k=t+"|"+sm;if(k!==hintTxt){hintTxt=k;h.replaceChildren(document.createTextNode(t));const s2=document.createElement("small");s2.textContent=sm;h.append(s2);h.classList.add("on")}}
+ else if(hintTxt.startsWith("Monte")||hintTxt.startsWith("Leve")){hintTxt="";h.classList.remove("on")}}
 const OBJS={
  1:{nome:"caju",titulo:"Colheita do caju",pt:"O caju maduro é apanhado do pé e levado à aldeia. Seu suco será preparado e fermentado no cauim, a bebida que dá corpo ao rito.",tp:"Akaîu oropyk, kaûĩ rã."},
  2:{nome:"caju mastigado",titulo:"Mascagem do caju",pt:"O caju é mastigado e devolvido às vasilhas: a saliva dá início à fermentação que transforma o suco em cauim.",tp:"akaîu (caju) · kaûĩ (cauim)",
@@ -1437,9 +1532,9 @@ function hitCaju(e){const r=canvas.getBoundingClientRect();_nd.set((e.clientX-r.
 function spinCaju(dx,dy){caju.rotateOnWorldAxis(Y,dx);_rx.set(1,0,0).applyQuaternion(camera.quaternion);caju.rotateOnWorldAxis(_rx,dy)}
 function tickCaju(dt){
  const h=$("#jhint"),dsc=$("#jdesc"),on=objOn();
- dsc.classList.toggle("on",on&&grabbed&&holdT>0);
+ dsc.classList.toggle("on",(on&&grabbed&&holdT>0)||MONTA.st===2);
  if(cajuTree&&cajuTree!==caju)cajuTree.rotateOnWorldAxis(Y,dt*.35);
- if(!caju){if(hintTxt){hintTxt="";h.classList.remove("on")}if(fillL&&cajuTree){fillL.position.copy(cajuTree.position);fillL.position.y+=.4}return}
+ if(!caju){if(hintTxt&&!MONTA.st&&!MONTA.want){hintTxt="";h.classList.remove("on")}if(fillL&&cajuTree){fillL.position.copy(cajuTree.position);fillL.position.y+=.4}return}
  const u=caju.userData;
  if(u.place){applyCam();const f=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);f.y=Math.max(-.25,Math.min(.15,f.y));f.normalize();caju.position.copy(camera.position).addScaledVector(f,1.2);caju.position.y-=.16;objKey.target.position.copy(caju.position);caju.rotation.set(.2,Math.atan2(f.x,f.z)+Math.PI+.5,0);u.place=false}
  if(u.float){const tgt=(holdT>0||gid!==null)?u.s:0,sc=caju.scale.x+(Math.max(.001,tgt)-caju.scale.x)*Math.min(1,dt*(tgt>0?5:3));caju.scale.setScalar(sc);caju.visible=sc>.01}
@@ -1454,7 +1549,7 @@ async function goScene(i,rota){if(busy)return;busy=true;ready=false;const c=DATA
  const L=$("#jload");L.hidden=false;L.classList.remove("out");$("#jls").textContent=c.sub;$("#jlt").textContent=c.titulo;$("#jlb").style.width="4%";$("#jlp").textContent="Carregando a cena…";fade.classList.remove("off");
  jstatus("");
  try{freeRoot();
-  const hd=QUAL==="alta"&&c.hd&&c.hd.length,pr=f=>{$("#jlb").style.width=Math.max(4,Math.round(f*100))+"%"};if(hd)$("#jlp").textContent="Carregando as esculturas em resolução original…";
+  const hd=QUAL==="alta"&&c.hd&&c.hd.length,pr=f=>{const w=Math.max(4,Math.round(f*100))+"%";$("#jlb").style.width=w;$("#jilb").style.width=w};if(hd)$("#jlp").textContent="Carregando as esculturas em resolução original…";
   const aoP=hd?Promise.resolve(null):fetch(c.glb.replace(/\.glb\.wasm$/,".ao.wasm")).then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);
   const g=hd?await loadHD(c.hd,pr):await loadGLB(c.glb,pr);const aoBuf=await aoP;
   $("#jlp").textContent="Montando a cena…";CELL_FAR=c.id==='A'?130:1e9;applyAO(g.scene,aoBuf);tidy(g.scene,c.id);scene.add(g.scene);gltfRoot=g.scene;if(c.id==='B')setupFrota();else frota=[];ci=i;applyEnv(c);
@@ -1468,9 +1563,10 @@ async function goScene(i,rota){if(busy)return;busy=true;ready=false;const c=DATA
  busy=false}
 async function boot(){
  try{DATA=await fetch("jogo/cenas.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})}catch(e){jstatus("Não foi possível carregar os dados do jogo.",boot);return}window.__showQual&&window.__showQual();
+ const lst=$("#jicenas");DATA.cenas.forEach((c,i)=>{const li=document.createElement("li"),b=document.createElement("b");b.textContent=String(i+1);li.append(b,document.createTextNode(c.titulo));lst.append(li)});
  const nav=$("#jcenas");DATA.cenas.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.textContent=String(i+1);b.title=c.sub+" · "+c.titulo;b.setAttribute("aria-label",c.sub+": "+c.titulo);b.onclick=()=>{if(i!==ci)goScene(i,0)};nav.append(b)});
- await goScene(0,0);$("#jpanel").hidden=false}
-window.__jogo={hEx:(x,z)=>hEx(x,z),scene,camera,renderer,get ready(){return ready},get ald(){return aldeia},get port(){return{oca,oca2,cajueiro,folhas:cajueiro&&cajueiro.userData.folhas,aldeia,regiao,treeGrp,cajuTree}},get aves(){return aves.map(a=>a.b.getWorldPosition(new THREE.Vector3()).toArray().map(v=>+v.toFixed(2)))},get cells(){return cellList.map(m=>{const b=m.userData.wb;return [b.min.toArray().map(Math.round),b.max.toArray().map(Math.round),m.geometry.index.count/3|0]})},jumpSky(){skyP=-1},probe(cx,cz,R,n){const rc=new THREE.Raycaster(),o=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=cx-R+2*R*i/(n-1),z=cz-R+2*R*j/(n-1);rc.set(new THREE.Vector3(x,-30,z),new THREE.Vector3(0,-1,0));const h=rc.intersectObjects(cellList,false);o.push([+x.toFixed(2),+z.toFixed(2),h.length?+h[0].point.y.toFixed(2):null,+hAt(x,z).toFixed(2)])}return o},pick(x,y){camera.updateMatrixWorld();const rc=new THREE.Raycaster();rc.setFromCamera(new THREE.Vector2(x,y),camera);const hs=rc.intersectObjects(cellList,false);return hs.length?[hs[0].point.toArray().map(v=>+v.toFixed(2)),hs[0].object.name]:null},set occ(v){OCC_ON=!!v;lastCP.set(1e9,0,0);lastTP.set(1e9,0,0)},go:(i,r)=>goScene(i,r),get caju(){return caju},get hold(){return holdT},info0:()=>0,get info(){return{ci,ri,tris:renderer.info.render.triangles,calls:renderer.info.render.calls,trees:treeSets.map(s=>s.N),occ:occStat,ald:aldeia?aldeia.children.length:-1,fog:fogos.length,cav:cavalo?cavalo.holder.position.toArray().map(v=>+v.toFixed(1)):null,owl:owls?owls.list.map(o=>[+o.x.toFixed(1),+o.y.toFixed(1),+o.z.toFixed(1)]):null,lz0:liz&&liz.list[0].ok?[liz.list[0].x,liz.list[0].z]:null,liz:liz?liz.list.filter(l=>l.ok).length:-1,fum:[fumAmt,!!fum,fum&&fum.visible,fum&&fum.material.uniforms.uC.value.toArray()]}}};
+ await goScene(0,0);$("#jild").hidden=true;$("#jibtn").hidden=false;try{$("#jibtn button:not([hidden])").focus({preventScroll:true})}catch(_){}}
+window.__jogo={get monta(){return MONTA},get rota(){return [ci,ri,+tR.toFixed(2),+holdT.toFixed(2),started]},montaProj(k){const p=MONTA.parts.find(q=>q.k===k);if(!p)return null;MONTA.G.updateMatrixWorld(true);const a=p.piv.getWorldPosition(new THREE.Vector3()).project(camera),b=MONTA.fig.localToWorld(p.home.clone()).project(camera),r=canvas.getBoundingClientRect();const f=v=>[r.left+(v.x+1)/2*r.width,r.top+(1-v.y)/2*r.height];return{de:f(a),para:f(b),placed:p.placed}},hEx:(x,z)=>hEx(x,z),scene,camera,renderer,get ready(){return ready},get ald(){return aldeia},get port(){return{oca,oca2,cajueiro,folhas:cajueiro&&cajueiro.userData.folhas,aldeia,regiao,treeGrp,cajuTree}},get aves(){return aves.map(a=>a.b.getWorldPosition(new THREE.Vector3()).toArray().map(v=>+v.toFixed(2)))},get cells(){return cellList.map(m=>{const b=m.userData.wb;return [b.min.toArray().map(Math.round),b.max.toArray().map(Math.round),m.geometry.index.count/3|0]})},jumpSky(){skyP=-1},probe(cx,cz,R,n){const rc=new THREE.Raycaster(),o=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=cx-R+2*R*i/(n-1),z=cz-R+2*R*j/(n-1);rc.set(new THREE.Vector3(x,-30,z),new THREE.Vector3(0,-1,0));const h=rc.intersectObjects(cellList,false);o.push([+x.toFixed(2),+z.toFixed(2),h.length?+h[0].point.y.toFixed(2):null,+hAt(x,z).toFixed(2)])}return o},pick(x,y){camera.updateMatrixWorld();const rc=new THREE.Raycaster();rc.setFromCamera(new THREE.Vector2(x,y),camera);const hs=rc.intersectObjects(cellList,false);return hs.length?[hs[0].point.toArray().map(v=>+v.toFixed(2)),hs[0].object.name]:null},set occ(v){OCC_ON=!!v;lastCP.set(1e9,0,0);lastTP.set(1e9,0,0)},go:(i,r)=>goScene(i,r),get caju(){return caju},get hold(){return holdT},info0:()=>0,get info(){return{ci,ri,tris:renderer.info.render.triangles,calls:renderer.info.render.calls,trees:treeSets.map(s=>s.N),occ:occStat,ald:aldeia?aldeia.children.length:-1,fog:fogos.length,cav:cavalo?cavalo.holder.position.toArray().map(v=>+v.toFixed(1)):null,owl:owls?owls.list.map(o=>[+o.x.toFixed(1),+o.y.toFixed(1),+o.z.toFixed(1)]):null,lz0:liz&&liz.list[0].ok?[liz.list[0].x,liz.list[0].z]:null,liz:liz?liz.list.filter(l=>l.ok).length:-1,fum:[fumAmt,!!fum,fum&&fum.visible,fum&&fum.material.uniforms.uC.value.toArray()]}}};
 boot();
 }
 </script>
