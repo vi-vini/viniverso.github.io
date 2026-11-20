@@ -225,7 +225,7 @@ body{margin:0;overflow:hidden}
 <div id="jdesc" role="note" lang="pt-BR"><b>Colheita do caju</b><p>O caju maduro é apanhado do pé e levado à aldeia. Seu suco será preparado e fermentado no cauim, a bebida que dá corpo ao rito.</p><div class="tp" lang="tpw"><span>Tupi antigo</span>Akaîu oropyk, kaûĩ rã.</div></div>
 <p class="jtitle hud" id="jroute"></p>
 <div class="jprog hud" aria-hidden="true"><i id="jbar"></i></div>
-<div class="vtools hud"><button id="jprev" type="button" aria-label="Trecho anterior">◀</button><button id="jplay" type="button" aria-pressed="true">Pausar</button><button id="jnext" type="button" aria-label="Próximo trecho">▶</button><button id="jspeed" type="button">Velocidade 1×</button><button id="jsom" type="button" aria-pressed="true">Som</button><button id="jgytoggle" type="button" aria-pressed="false">Giroscópio</button><button id="jrecenter" type="button">Recentralizar</button></div>
+<div class="vtools hud"><button id="jprev" type="button" aria-label="Trecho anterior">◀</button><button id="jplay" type="button" aria-pressed="true">Pausar</button><button id="jnext" type="button" aria-label="Próximo trecho">▶</button><button id="jspeed" type="button">Velocidade 1×</button><button id="jsom" type="button" aria-pressed="true">Som</button><button id="jgytoggle" type="button" aria-pressed="false">Giroscópio</button><button id="jrecenter" type="button">Recentralizar</button><button id="jqual" type="button" hidden>Qualidade: alta</button></div>
 <div id="jload" hidden><small id="jls"></small><b id="jlt"></b><i><u id="jlb"></u></i><p id="jlp">Carregando a cena…</p></div>
 </main>
 <script>const $=s=>document.querySelector(s);</script>
@@ -272,6 +272,8 @@ const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 const eul=new THREE.Euler(),q0=new THREE.Quaternion(),q1=new THREE.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5)),qDev=new THREE.Quaternion(),qa=new THREE.Quaternion();
 let gyro=false,got=false,needCal=false,yawOff=0,dragYaw=0,dragPitch=0,raf=0,lastT=0,slow=0,wake=null,active=true,started=false;
 let caju=null,cajuHit=null,cubeMesh=null,holdT=0,foc=0,gid=null,gx=0,gy=0,cvx=0,cvy=0,hintTxt="",grabbed=false;
+const MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
+let QUAL=(()=>{const m=location.search.match(/[?&]q=(alta|leve)/);if(m)return m[1];try{const v=localStorage.getItem("qm.qual");if(v)return v}catch(_){}return MOBILE||weak?"leve":"alta"})();
 let DATA=null,ci=-1,ri=0,tR=0,durR=10,playing=true,speeds=[.45,.75,1.5],si=1,ready=false,busy=false,gltfRoot=null,T=0,idleT=0;
 const mode=$("#jmode"),bGy=$("#jgytoggle"),bPlay=$("#jplay"),bar=$("#jbar"),title=$("#jroute"),bSp=$("#jspeed"),fade=$("#jfade"),card=$("#jcard"),bSom=$("#jsom");
 const setMode=t=>{mode.textContent=t};
@@ -342,8 +344,11 @@ function tick(t){raf=0;if(!ready)return;const dt=Math.min(.1,(t-lastT)/1000||.01
 function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.fov=camera.aspect<1?82:68;camera.updateProjectionMatrix();request()}
 new ResizeObserver(size).observe(host);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){lastT=0;request();if(gyro)wakeOn()}syncSom()});
-canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();jstatus("O aparelho pausou o gráfico 3D. Volte para esta tela para continuar.")});
+canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();if(QUAL==="alta"&&DATA&&DATA.cenas.some(c=>c.hd&&c.hd.length)){try{localStorage.setItem("qm.qual","leve")}catch(_){}jstatus("A resolução original passou do limite da placa de vídeo deste aparelho. Voltando para a versão leve…");setTimeout(()=>{location.href=location.pathname+"?q=leve"},1800);return}jstatus("O aparelho pausou o gráfico 3D. Volte para esta tela para continuar.")});
 canvas.addEventListener("webglcontextrestored",()=>{jstatus("");request()});
+{const qb=$("#jqual");const upd=()=>{qb.textContent="Qualidade: "+QUAL;qb.setAttribute("aria-pressed",String(QUAL==="alta"))};upd();
+ qb.onclick=()=>{if(busy)return;QUAL=QUAL==="alta"?"leve":"alta";try{localStorage.setItem("qm.qual",QUAL)}catch(_){}upd();goScene(ci,ri)};
+ window.__showQual=()=>{qb.hidden=!(DATA&&DATA.cenas.some(c=>c.hd&&c.hd.length))}}
 $("#jrecenter").onclick=()=>{if(gyro)calibrate();else{dragYaw=0;dragPitch=0}request()};
 bGy.onclick=async()=>{if(gyro){gyroOff();dragYaw=0;dragPitch=0;setMode("Modo toque: arraste o dedo para olhar ao redor.");request()}else{await gyroOn()}};
 bPlay.onclick=()=>{playing=!playing;bPlay.textContent=playing?"Pausar":"Continuar";bPlay.setAttribute("aria-pressed",String(playing));request()};
@@ -528,6 +533,9 @@ function tickSky(dt){
  setSkyAt(skyP);if(rainAmt>.001){const o=rainAmt,gT=_k.set(.36,.4,.46),gB=new THREE.Vector3(.5,.52,.55);skyU.top.value.lerp(gT,.7*o).multiplyScalar(1-.25*o);skyU.bot.value.lerp(gB,.75*o).multiplyScalar(1-.2*o);skyU.sunC.value.multiplyScalar(1-.92*o);skyU.halo.value.multiplyScalar(1-.85*o);sun.intensity*=1-.7*o;hemi.intensity*=1-.25*o;hemi.color.lerp(new THREE.Color(.62,.66,.72),.6*o)}
  if(scene.fog){scene.fog.density=.0015*(1+1.6*rainAmt);const t=skyU.top.value,b=skyU.bot.value;scene.fog.color.setRGB(b.x*.88+t.x*.12,b.y*.88+t.y*.12,b.z*.88+t.z*.12)}}
 function loadGLB(url,prog){return new Promise((res,rej)=>loader.load(url,res,e=>{if(e.lengthComputable)prog(e.loaded/e.total)},rej))}
+// resolução original (esculturas sem simplificação, em blocos): padrão no computador; no celular, a versão leve
+async function loadHD(list,prog){const grp=new THREE.Group();let sizes=list.map(()=>0),got=list.map(()=>0);
+ for(let i=0;i<list.length;i++){const g=await loadGLB(list[i].u,f=>{got[i]=f;prog((i+f)/list.length)});grp.add(g.scene)}return{scene:grp}}
 
 // ---------- árvores e plantas como INSTÂNCIAS (todas as do terreno do Unity) ----------
 const windU={uTime:{value:0}};
@@ -1435,8 +1443,9 @@ async function goScene(i,rota){if(busy)return;busy=true;ready=false;const c=DATA
  const L=$("#jload");L.hidden=false;L.classList.remove("out");$("#jls").textContent=c.sub;$("#jlt").textContent=c.titulo;$("#jlb").style.width="4%";$("#jlp").textContent="Carregando a cena…";fade.classList.remove("off");
  jstatus("");
  try{freeRoot();
-  const aoP=fetch(c.glb.replace(/\.glb\.wasm$/,".ao.wasm")).then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);
-  const g=await loadGLB(c.glb,f=>{$("#jlb").style.width=Math.max(4,Math.round(f*100))+"%"});const aoBuf=await aoP;
+  const hd=QUAL==="alta"&&c.hd&&c.hd.length,pr=f=>{$("#jlb").style.width=Math.max(4,Math.round(f*100))+"%"};if(hd)$("#jlp").textContent="Carregando as esculturas em resolução original…";
+  const aoP=hd?Promise.resolve(null):fetch(c.glb.replace(/\.glb\.wasm$/,".ao.wasm")).then(r=>r.ok?r.arrayBuffer():null).catch(()=>null);
+  const g=hd?await loadHD(c.hd,pr):await loadGLB(c.glb,pr);const aoBuf=await aoP;
   $("#jlp").textContent="Montando a cena…";CELL_FAR=c.id==='A'?130:1e9;applyAO(g.scene,aoBuf);tidy(g.scene,c.id);scene.add(g.scene);gltfRoot=g.scene;if(c.id==='B')setupFrota();else frota=[];ci=i;applyEnv(c);
   $("#jlp").textContent="Plantando as árvores…";try{await loadTrees("ABCD"[i])}catch(e){console.error("árvores:",e)}
   if(i===0){setupCaju();try{if(cajuTree){cajueiro=mkCajueiro(cajuTree.position);if(cajueiro)scene.add(cajueiro)}}catch(e){console.log('cajueiro:',e.message)}try{oca=mkOca(OCA);if(oca)scene.add(oca);oca2=mkOca(OCA2);if(oca2)scene.add(oca2)}catch(e){console.log('oca:',e.message,e.stack)}}try{vida=mkVida();if(vida)scene.add(vida)}catch(e){console.log('vida:',e.message)}try{regiao=mkRegiao();if(regiao)scene.add(regiao)}catch(e){console.log('regiao:',e.message)}try{aldeia=mkAldeia();if(aldeia)scene.add(aldeia)}catch(e){console.log('aldeia:',e.message,e.stack)}
@@ -1444,13 +1453,13 @@ async function goScene(i,rota){if(busy)return;busy=true;ready=false;const c=DATA
   fading=false;startRoute(rota||0,true);syncSom();
   L.classList.add("out");setTimeout(()=>{L.hidden=true},520);fade.classList.add("off");showCard(c.sub,c.titulo);
   history.replaceState&&0;request()}
- catch(e){console.error("jogo:",e);L.hidden=true;jstatus("Não foi possível carregar a cena. Verifique a conexão e tente de novo.",()=>{busy=false;goScene(i,rota)});return}
+ catch(e){console.error("jogo:",e);if(QUAL==="alta"&&c.hd&&c.hd.length){QUAL="leve";const qb=$("#jqual");qb.textContent="Qualidade: leve";busy=false;return goScene(i,rota)}L.hidden=true;jstatus("Não foi possível carregar a cena. Verifique a conexão e tente de novo.",()=>{busy=false;goScene(i,rota)});return}
  busy=false}
 async function boot(){
- try{DATA=await fetch("jogo/cenas.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})}catch(e){jstatus("Não foi possível carregar os dados do jogo.",boot);return}
+ try{DATA=await fetch("jogo/cenas.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})}catch(e){jstatus("Não foi possível carregar os dados do jogo.",boot);return}window.__showQual&&window.__showQual();
  const nav=$("#jcenas");DATA.cenas.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.textContent=String(i+1);b.title=c.sub+" · "+c.titulo;b.setAttribute("aria-label",c.sub+": "+c.titulo);b.onclick=()=>{if(i!==ci)goScene(i,0)};nav.append(b)});
  await goScene(0,0);$("#jpanel").hidden=false}
-window.__jogo={hEx:(x,z)=>hEx(x,z),scene,camera,renderer,get ready(){return ready},get ald(){return aldeia},get aves(){return aves.map(a=>a.b.getWorldPosition(new THREE.Vector3()).toArray().map(v=>+v.toFixed(2)))},get cells(){return cellList.map(m=>{const b=m.userData.wb;return [b.min.toArray().map(Math.round),b.max.toArray().map(Math.round),m.geometry.index.count/3|0]})},jumpSky(){skyP=-1},probe(cx,cz,R,n){const rc=new THREE.Raycaster(),o=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=cx-R+2*R*i/(n-1),z=cz-R+2*R*j/(n-1);rc.set(new THREE.Vector3(x,-30,z),new THREE.Vector3(0,-1,0));const h=rc.intersectObjects(cellList,false);o.push([+x.toFixed(2),+z.toFixed(2),h.length?+h[0].point.y.toFixed(2):null,+hAt(x,z).toFixed(2)])}return o},pick(x,y){camera.updateMatrixWorld();const rc=new THREE.Raycaster();rc.setFromCamera(new THREE.Vector2(x,y),camera);const hs=rc.intersectObjects(cellList,false);return hs.length?[hs[0].point.toArray().map(v=>+v.toFixed(2)),hs[0].object.name]:null},set occ(v){OCC_ON=!!v;lastCP.set(1e9,0,0);lastTP.set(1e9,0,0)},go:(i,r)=>goScene(i,r),get caju(){return caju},get hold(){return holdT},info0:()=>0,get info(){return{ci,ri,tris:renderer.info.render.triangles,calls:renderer.info.render.calls,trees:treeSets.map(s=>s.N),occ:occStat,ald:aldeia?aldeia.children.length:-1,fog:fogos.length,cav:cavalo?cavalo.holder.position.toArray().map(v=>+v.toFixed(1)):null,owl:owls?owls.list.map(o=>[+o.x.toFixed(1),+o.y.toFixed(1),+o.z.toFixed(1)]):null,lz0:liz&&liz.list[0].ok?[liz.list[0].x,liz.list[0].z]:null,liz:liz?liz.list.filter(l=>l.ok).length:-1,fum:[fumAmt,!!fum,fum&&fum.visible,fum&&fum.material.uniforms.uC.value.toArray()]}}};
+window.__jogo={hEx:(x,z)=>hEx(x,z),scene,camera,renderer,get ready(){return ready},get ald(){return aldeia},get port(){return{oca,oca2,cajueiro,folhas:cajueiro&&cajueiro.userData.folhas,aldeia,regiao,treeGrp,cajuTree}},get aves(){return aves.map(a=>a.b.getWorldPosition(new THREE.Vector3()).toArray().map(v=>+v.toFixed(2)))},get cells(){return cellList.map(m=>{const b=m.userData.wb;return [b.min.toArray().map(Math.round),b.max.toArray().map(Math.round),m.geometry.index.count/3|0]})},jumpSky(){skyP=-1},probe(cx,cz,R,n){const rc=new THREE.Raycaster(),o=[];for(let i=0;i<n;i++)for(let j=0;j<n;j++){const x=cx-R+2*R*i/(n-1),z=cz-R+2*R*j/(n-1);rc.set(new THREE.Vector3(x,-30,z),new THREE.Vector3(0,-1,0));const h=rc.intersectObjects(cellList,false);o.push([+x.toFixed(2),+z.toFixed(2),h.length?+h[0].point.y.toFixed(2):null,+hAt(x,z).toFixed(2)])}return o},pick(x,y){camera.updateMatrixWorld();const rc=new THREE.Raycaster();rc.setFromCamera(new THREE.Vector2(x,y),camera);const hs=rc.intersectObjects(cellList,false);return hs.length?[hs[0].point.toArray().map(v=>+v.toFixed(2)),hs[0].object.name]:null},set occ(v){OCC_ON=!!v;lastCP.set(1e9,0,0);lastTP.set(1e9,0,0)},go:(i,r)=>goScene(i,r),get caju(){return caju},get hold(){return holdT},info0:()=>0,get info(){return{ci,ri,tris:renderer.info.render.triangles,calls:renderer.info.render.calls,trees:treeSets.map(s=>s.N),occ:occStat,ald:aldeia?aldeia.children.length:-1,fog:fogos.length,cav:cavalo?cavalo.holder.position.toArray().map(v=>+v.toFixed(1)):null,owl:owls?owls.list.map(o=>[+o.x.toFixed(1),+o.y.toFixed(1),+o.z.toFixed(1)]):null,lz0:liz&&liz.list[0].ok?[liz.list[0].x,liz.list[0].z]:null,liz:liz?liz.list.filter(l=>l.ok).length:-1,fum:[fumAmt,!!fum,fum&&fum.visible,fum&&fum.material.uniforms.uC.value.toArray()]}}};
 boot();
 }
 </script>
