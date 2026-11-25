@@ -455,7 +455,9 @@ async function carregaLuz(THREE,cfg,leve){const tl=new THREE.TextureLoader(),L=c
 function decalChao(THREE,ch,L){const m=new THREE.Mesh(new THREE.PlaneGeometry(2*L.raio,2*L.raio),new THREE.MeshBasicMaterial({color:0,alphaMap:ch,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
  m.rotation.x=-Math.PI/2;m.position.set(L.cx,.004,L.cz);m.renderOrder=1;m.userData.decal=true;return m}
 // materiais com nome: a escultura impressa em PLA cor cobre
-function materialDe(THREE,nome){if(nome==="pla-vermelho")return new THREE.MeshPhysicalMaterial({color:0xa60935,metalness:0,roughness:.32,clearcoat:.15,clearcoatRoughness:.35});
+const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function materialDe(THREE,nome){if(IOS){const c={"pla-vermelho":[0xa60935,0,.38],"pla-cobre":[0xa8643a,.45,.4],"pla-creme":[0xd8c6a8,0,.5],"pla-bege":[0xc89770,0,.5]}[nome];if(c)return new THREE.MeshStandardMaterial({color:c[0],metalness:c[1],roughness:c[2]});return null}
+ if(nome==="pla-vermelho")return new THREE.MeshPhysicalMaterial({color:0xa60935,metalness:0,roughness:.32,clearcoat:.15,clearcoatRoughness:.35});
  if(nome==="pla-cobre")return new THREE.MeshPhysicalMaterial({color:0xa8643a,metalness:.55,roughness:.38,clearcoat:.2,clearcoatRoughness:.35});
  if(nome==="pla-creme")return new THREE.MeshPhysicalMaterial({color:0xd8c6a8,metalness:0,roughness:.5});
  if(nome==="pla-bege")return new THREE.MeshPhysicalMaterial({color:0xc89770,metalness:0,roughness:.5});return null}
@@ -466,14 +468,14 @@ async function init(){
 const [THREE,{OrbitControls},{RoomEnvironment},{GLTFLoader},{MeshoptDecoder}]=await Promise.all([import("three"),import("three/addons/controls/OrbitControls.js"),import("three/addons/environments/RoomEnvironment.js"),import("three/addons/loaders/GLTFLoader.js"),import("three/addons/libs/meshopt_decoder.module.js")]);
 const canvas=$("#stage"),host=$("#viewer");
 let renderer;
-try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:"high-performance"})}catch(e){throw new Error("webgl")}
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:!IOS,alpha:!IOS,powerPreference:IOS?"default":"high-performance"})}catch(e){throw new Error("webgl")}
 const weak=(navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=2;
-let pr=Math.min(window.devicePixelRatio||1,weak?1.5:2);
-renderer.setPixelRatio(pr);renderer.setClearColor(0x000000,0);
+let pr=Math.min(window.devicePixelRatio||1,IOS?2:weak?1.5:2);
+renderer.setPixelRatio(pr);renderer.setClearColor(IOS?0x1a0505:0x000000,IOS?1:0);
 renderer.toneMapping=THREE.NeutralToneMapping;
 const scene=new THREE.Scene();
-const pm=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();
-const roomEnv=pm.fromScene(room,.04).texture;scene.environment=roomEnv;scene.environmentIntensity=.7;room.dispose();pm.dispose();
+let roomEnv=null;if(IOS){scene.add(new THREE.HemisphereLight(0xfff1e6,0x3a1410,1.6));const f=new THREE.DirectionalLight(0xffffff,.8);f.position.set(-2,1.5,3);scene.add(f)}else{const pm=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();
+roomEnv=pm.fromScene(room,.04).texture;scene.environment=roomEnv;scene.environmentIntensity=.7;room.dispose();pm.dispose();}
 const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(2,3,2);scene.add(key);
 const camera=new THREE.PerspectiveCamera(35,1,.01,100);
 const controls=new OrbitControls(camera,canvas);
