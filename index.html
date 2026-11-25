@@ -705,4 +705,11 @@ route();
 </script>
 
 
+<script>
+/* mantém o texto de ajuda sempre acima dos botões (no iPhone os botões podem ocupar 3 linhas) */
+(()=>{const fix=()=>{for(const v of document.querySelectorAll('#viewer,#imerso')){const t=v.querySelector('.vtools'),i=v.querySelector('.vinfo');if(!t||!t.offsetHeight)continue;let y=t.offsetHeight+8;for(const e of v.querySelectorAll('.vinfo,.vhint,#imode')){if(e.offsetParent===null&&!e.textContent)continue;e.style.bottom=y+'px';y+=Math.max(e.offsetHeight,18)+2}}};
+try{const ro=new ResizeObserver(fix);document.querySelectorAll('.vtools').forEach(t=>ro.observe(t))}catch(e){}
+addEventListener('resize',fix);addEventListener('hashchange',()=>setTimeout(fix,50));new MutationObserver(fix).observe(document.body,{subtree:true,attributes:true,attributeFilter:['hidden']});setTimeout(fix,300)})();
+</script>
+<style>@media (max-width:520px){.vtools{gap:6px}.vtools button{padding:8px 10px;font-size:13px;font-stretch:100%}}</style>
 </body></html>
