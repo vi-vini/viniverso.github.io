@@ -1,1 +1,708 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Viniverso</title><meta http-equiv="refresh" content="0; url=quatro-momentos/"><style>body{margin:0;background:#1a0a05;color:#f5e9dc;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}a{color:#ffb300}</style></head><body><p><a href="quatro-momentos/">Quatro momentos da vida de Felipe Camarão</a></p></body></html>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Vinícius Fernandes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/","three/examples/jsm/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/","three-mesh-bvh":"https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.8.3/build/index.module.js","three-gpu-pathtracer":"https://cdn.jsdelivr.net/npm/three-gpu-pathtracer@0.0.23/build/index.module.js"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Hanken+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: faixa de caracteres em movimento no topo, coluna única de 880px, títulos gigantes largos (cartaz EXP1) sobre texto pequeno (ginga). Visual único e deliberado, sem tema escuro. */
+:root{
+  --bg:#b41414;      /* vermelho do ginga */
+  --ink:#ffffff;     /* texto e traços */
+  --paper:#8f1010;   /* campos de formulário */
+  --acc:#ffa500;     /* links e datas, laranja do ginga */
+  --sun:#ffa500;     /* botões */
+  --dark:#1a0505;    /* faixa e texto sobre laranja */
+  --wide:"Archivo","Arial Narrow",Arial,sans-serif;
+  --text:"Hanken Grotesk",system-ui,sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:300 17px/1.45 var(--text);overflow-x:hidden}
+a{color:var(--acc);text-decoration:none;font-weight:600}
+a:hover{background:var(--ink);color:var(--bg)}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.in{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* faixa que corre da esquerda para a direita */
+.strip{background:var(--dark);color:var(--sun);overflow:hidden;white-space:nowrap;font:700 15px/1 var(--wide);font-stretch:125%;padding:11px 0}
+.strip .track{display:inline-flex;animation:right 38s linear infinite}
+.strip span{padding-right:0}
+@keyframes right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+nav.top{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center;padding-block:16px;font-size:15px}
+nav.top .sp{margin-right:auto}
+nav.top a::before{content:"✶ ";font-weight:400}
+.cartbtn{border:2px solid var(--ink);background:var(--sun);color:var(--dark);border-radius:0;padding:5px 12px;font:700 14px var(--wide);font-stretch:125%}
+
+/* hero: tipografia do cartaz */
+.hero{position:relative;padding-top:10px;padding-bottom:30px}
+.outline{font:300 clamp(48px,15vw,128px)/.9 var(--wide);font-stretch:125%;color:transparent;-webkit-text-stroke:1.5px var(--ink);margin:0;letter-spacing:-.02em;white-space:nowrap}
+.hero h1{position:relative;margin:0;font:800 clamp(30px,10.4vw,92px)/.9 var(--wide);font-stretch:125%;letter-spacing:-.025em;white-space:nowrap}
+.hero h1 .star{position:absolute;width:1.25em;height:1.25em;right:2%;top:.38em}
+.star path{fill:var(--bg);stroke:var(--ink);stroke-width:1.6;vector-effect:non-scaling-stroke}
+.arc{position:absolute;left:0;top:30%;width:42%;height:58%;pointer-events:none}
+.arc path{fill:none;stroke:var(--ink);stroke-width:2.5;vector-effect:non-scaling-stroke}
+.names{margin:14px 0 0 40%;font:300 clamp(24px,5.6vw,46px)/1 var(--text);letter-spacing:-.02em}
+.names div{display:block}
+.when{margin:26px 0 0 14%;font:700 clamp(30px,8vw,64px)/1 var(--wide);font-stretch:112%;letter-spacing:-.03em}
+.small{display:grid;grid-template-columns:1fr 1fr;gap:6px 34px;margin-top:26px;font-size:15px;line-height:1.3}
+.small p{margin:0 0 10px}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{display:inline-block;border:2px solid var(--ink);background:var(--ink);color:var(--bg);padding:10px 18px;font:700 15px var(--wide);font-stretch:112%;border-radius:0}
+.btn:hover{background:var(--sun);color:var(--dark)}
+.btn.alt{background:transparent;color:var(--ink)}
+
+section{border-top:2px solid var(--ink);padding-block:34px 44px}
+section h2{margin:0 0 6px;font:300 clamp(46px,14vw,112px)/.92 var(--wide);font-stretch:125%;color:transparent;-webkit-text-stroke:1.5px var(--ink);letter-spacing:-.02em}
+.lead{max-width:60ch;margin:6px 0 22px;font-size:16px}
+
+.tabs{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:12px;font-size:15px}
+.tabs button{border:0;background:none;padding:2px 0;font-weight:400}
+.tabs button[aria-pressed="true"]{font-weight:800;border-bottom:3px solid var(--ink)}
+.item{display:grid;grid-template-columns:96px 1fr auto;gap:6px 16px;align-items:center;padding:14px 0;border-top:1px solid var(--ink)}
+.item img{width:96px;height:96px;object-fit:cover;border:2px solid var(--ink)}
+.item h3{margin:0;font:800 20px/1.05 var(--wide);font-stretch:112%;letter-spacing:-.015em}
+.item small{display:block;font-size:13px;font-weight:600;color:var(--acc)}
+.item p{margin:4px 0 0;font-size:14px;line-height:1.3}
+.item .buy{text-align:right}
+.price{display:block;font:800 20px var(--wide);font-stretch:112%;margin-bottom:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.add{border:2px solid var(--ink);background:var(--sun);color:var(--dark);padding:6px 12px;font:700 13px var(--wide);font-stretch:112%;border-radius:0}
+.add:hover{background:var(--ink);color:var(--bg)}
+
+.phase{display:grid;grid-template-columns:150px 1fr;gap:6px 22px;padding:20px 0;border-top:1px solid var(--ink)}
+.phase h3{margin:0;font:800 28px/1 var(--wide);font-stretch:125%;letter-spacing:-.03em;color:var(--acc)}
+.phase p{margin:0;font-size:16px}
+.imgs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.imgs img{height:150px;width:auto;border:2px solid var(--ink)}
+ul.ex{list-style:none;margin:0;padding:0;font:300 clamp(20px,4.2vw,32px)/1.12 var(--text);letter-spacing:-.02em}
+ul.ex li{padding:3px 0}
+ul.ex li::before{content:"→ ";font-weight:400}
+ul.ex b{font-weight:600}
+
+form{display:grid;gap:6px;max-width:520px}
+label{font-size:14px;font-weight:600}
+input,textarea{width:100%;font:inherit;padding:10px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:0}
+footer{border-top:2px solid var(--ink);padding-block:22px 40px;font-size:14px}
+footer p{margin:0 0 6px}
+
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--bg);border-left:2px solid var(--ink);z-index:9;transform:translateX(105%);transition:transform .25s;display:flex;flex-direction:column;padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) 18px}
+#drawer.open{transform:none}
+#drawer h3{margin:0;font:800 26px var(--wide);font-stretch:125%}
+#items{flex:1;overflow:auto;margin:12px 0}
+.row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--ink)}
+.row button{border:0;background:none;text-decoration:underline;padding:0}
+
+@media (max-width:640px){
+  .small{grid-template-columns:1fr}
+  .names{margin-left:34%}
+  .when{margin-left:8%}
+  .item{grid-template-columns:72px 1fr;}
+  .item img{width:72px;height:72px}
+  .item .buy{grid-column:1 / -1;text-align:left;display:flex;align-items:center;gap:14px}
+  .item .price{margin:0}
+  .phase{grid-template-columns:1fr}
+  .imgs img{height:110px}
+}
+@media (prefers-reduced-motion:reduce){.strip .track{animation:none}#drawer{transition:none}html{scroll-behavior:auto}}
+
+/* botão Ver em 3D e áreas de botões na loja */
+a.add{display:inline-block;text-decoration:none}
+.add.view{background:transparent;color:var(--ink)}
+.add.view:hover{background:var(--ink);color:var(--bg)}
+.btns{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+
+/* visualizador 3D (abre pelo QR code: endereço do site + #modelo-nome) */
+#gpv{display:block;width:100%;max-width:560px;aspect-ratio:1/1;background:#000;margin:18px 0;border:2px solid var(--ink)}
+#viewer,#imerso{position:fixed;inset:0;z-index:20;background:radial-gradient(ellipse at 50% 55%,var(--paper) 0%,var(--dark) 78%);color:var(--ink);overflow:hidden}
+#stage,#stage2{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+.vbar{position:absolute;left:0;right:0;top:0;display:flex;align-items:flex-start;gap:16px;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));pointer-events:none}
+.vbar>*{pointer-events:auto}
+.vback{font:700 14px var(--wide);font-stretch:112%;color:var(--ink);background:var(--dark);border:2px solid var(--ink);padding:7px 12px;white-space:nowrap}
+.vback:hover{background:var(--sun);color:var(--dark)}
+.vtitle{min-width:0;pointer-events:none}
+.vtitle b{display:block;font:800 clamp(22px,6vw,34px)/1 var(--wide);font-stretch:125%;letter-spacing:-.025em}
+.vtitle span{display:block;font-size:14px;margin-top:4px}
+.vstatus{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(320px,calc(100% - 32px));display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;font-size:16px;background:var(--dark);border:2px solid var(--ink);padding:16px}
+.vtools{position:absolute;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.vtools button{border:2px solid var(--ink);background:var(--dark);color:var(--ink);padding:9px 14px;font:700 14px var(--wide);font-stretch:112%;border-radius:0}
+.vtools button[aria-pressed="true"]{background:var(--sun);color:var(--dark)}
+.vtools button:hover{background:var(--ink);color:var(--dark)}
+.vinfo{position:absolute;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom,0px));margin:0;text-align:center;font-size:13px;font-variant-numeric:tabular-nums;pointer-events:none}
+.vhint{position:absolute;left:0;right:0;bottom:calc(88px + env(safe-area-inset-bottom,0px));margin:0;text-align:center;font-size:13px;pointer-events:none}
+@media (max-width:560px){#viewer.vrt-on .vinfo{bottom:calc(114px + env(safe-area-inset-bottom,0px))}#viewer.vrt-on .vhint{bottom:calc(136px + env(safe-area-inset-bottom,0px))}}
+
+/* página de QR codes */
+.qrgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:26px;margin-top:22px}
+.qrcard{border:2px solid var(--ink);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qrcard h3{margin:0;font:800 20px/1.05 var(--wide);font-stretch:112%}
+.qrbox{background:#fff;width:100%;max-width:300px}
+.qrbox svg{display:block;width:100%;height:auto}
+.qrcard code{font-size:12px;word-break:break-all}
+
+/* miniatura clicável e página de galeria */
+.item .thumb{display:block;width:96px;height:96px}
+.item .thumb:hover{background:none;outline:3px solid var(--sun);outline-offset:2px}
+.item .thumb img{width:100%;height:100%}
+@media (max-width:640px){.item .thumb{width:72px;height:72px}}
+.gk{display:block;font-size:13px;font-weight:600;color:var(--acc)}
+section h2.gt{color:var(--ink);-webkit-text-stroke:0;font:800 clamp(28px,7.5vw,60px)/1 var(--wide);font-stretch:125%;letter-spacing:-.03em;margin:4px 0 10px}
+.gfotos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px;margin:6px 0 22px}
+.gfotos figure{margin:0;min-width:0}
+.gfotos img{width:100%;height:auto;border:2px solid var(--ink)}
+.gfotos figcaption{font-size:14px;font-weight:600;margin-top:6px}
+.gvid{margin:6px 0 22px}
+.gvid video{display:block;width:100%;max-width:520px;height:auto;border:2px solid var(--ink);background:var(--dark)}
+.gvid p{font-size:13px;margin:6px 0 0}
+.ipanel p{margin:0}
+.ipanel .btnrow{margin-top:0;justify-content:center}
+#imode{bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+.gbuy{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+</style>
+
+<div id="site">
+<div class="strip" aria-hidden="true"><div class="track">
+<span>✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → VINÍCIUS FERNANDES ✶ ▲◢◣ ⇅ → ✶ ◤◥ ⇅ → ARTISTA 3D ✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → METAVERSO V ✶ ▲◢◣ ⇅ → ✶ ◤◥ ⇅ → </span>
+<span>✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → VINÍCIUS FERNANDES ✶ ▲◢◣ ⇅ → ✶ ◤◥ ⇅ → ARTISTA 3D ✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → METAVERSO V ✶ ▲◢◣ ⇅ → ✶ ◤◥ ⇅ → </span>
+</div></div>
+
+<div class="in">
+<nav class="top" aria-label="Seções"><span class="sp"></span><a href="#loja">loja</a><a href="#trabalhos">trabalhos</a><a href="#exposicoes">exposições</a><a href="#contato">contato</a><button class="cartbtn" id="open" aria-label="Abrir carrinho">Carrinho (<span id="n">0</span>)</button></nav>
+
+<div class="hero">
+<p class="outline">ARTISTA 3D</p>
+<h1>VINÍCIUS<br>FERNANDES<svg class="star" viewBox="-52 -52 104 104" aria-hidden="true"><path d="M0.0 -50.0 Q0.8 -1.3 43.3 -25.0 Q1.5 0.0 43.3 25.0 Q0.8 1.3 0.0 50.0 Q-0.7 1.3 -43.3 25.0 Q-1.5 0.0 -43.3 -25.0 Q-0.8 -1.3 0.0 -50.0Z"/></svg></h1>
+<div class="names"><div>Modelagem 3D</div><div>Impressão 3D</div><div>Realidade virtual</div><div>Pintura</div></div>
+<div class="small">
+<div><p>→ Natal, Rio Grande do Norte. Nascido em Jaboatão dos Guararapes (PE), 1998.</p><p>→ Blender, Maya, ZBrush e Substance Painter.</p></div>
+<div><p>→ Diretor de arte do Metaverso V, jogo multiplayer para web e VR.</p><p>→ Pedidos e orçamentos pelo WhatsApp.</p></div>
+</div>
+<div class="btnrow"><a class="btn" href="#loja">Ver a loja</a><a class="btn alt" href="#trabalhos">Ver trabalhos</a><a class="btn alt" href="#gameplay">Ver gameplay em VR</a><a class="btn alt" href="quatro-momentos/">Jogar Quatro Momentos</a></div>
+</div>
+</div>
+
+<section id="loja"><div class="in">
+<h2>LOJA</h2>
+<p class="lead">Escolha os itens e envie o pedido. Eu confirmo disponibilidade, prazo e frete pelo WhatsApp e combinamos o pagamento por Pix.</p>
+<div class="tabs" id="tabs" role="group" aria-label="Filtrar por tipo"></div>
+<div id="grid"></div>
+</div></section>
+
+<section id="trabalhos"><div class="in">
+<h2>TRABALHOS</h2>
+<p class="lead">Comecei na pintura expressionista e passei para o 3D. O gesto de antes continua nas formas pontiagudas e retorcidas de hoje.</p>
+<div class="phase"><h3>2022–23</h3><div><p><b>Pintura e gravura.</b> Acrílico e óleo sobre tela, em séries como <i>Doce Risoflora</i> e <i>Deriva Situada</i>. Corpo, cidade e ambiente em camadas de cor.</p>
+<div class="imgs"><img src="img/risoflora.jpg" alt="Pintura Risoflora, em tons de laranja, azul e verde" loading="lazy"><img src="img/deriva.jpg" alt="Deriva Situada, mapa urbano em preto e vermelho sobre linho" loading="lazy"></div></div></div>
+<div class="phase"><h3>2019–24</h3><div><p><b>Modelagem 3D.</b> Personagens e criaturas feitos em Blender, Maya, ZBrush e Substance Painter, como <i>The Fury</i>, <i>Leviathan</i> e <i>Écorché</i>.</p>
+<div class="imgs"><img src="img/fury.jpg" alt="The Fury, personagem 3D" loading="lazy"><img src="img/leviathan.jpg" alt="Leviathan, modelagem 3D" loading="lazy"><img src="img/ecorche.jpg" alt="Écorché, estudo de músculos em 3D" loading="lazy"></div></div></div>
+<div class="phase"><h3>2025</h3><div><p><b>Metaverso V e OCAMPUS.</b> Jogo multiplayer para web e VR, gêmeo virtual da galeria do Departamento de Artes da UFRN, com esculturas impressas em 3D.</p>
+<div class="imgs"><img src="img/monumento.jpg" alt="Apropriação de um Monumento, escultura impressa em 3D" loading="lazy"><img src="img/carcara.jpg" alt="Carcará, personagem do jogo" loading="lazy"><img src="img/vr.jpg" alt="Visitantes usando óculos de realidade virtual na exposição" loading="lazy"></div></div></div>
+<div class="phase"><h3>2026</h3><div><p><b>Felipe Camarão em realidade virtual.</b> Trabalho de conclusão de curso: diorama digital em Meta Quest 3, com versões impressas em 3D das figuras.</p>
+<div class="imgs"><img src="img/camaraoprint.jpg" alt="Felipe Camarão, escultura impressa em PLA" loading="lazy"><img src="img/camarao3d.jpg" alt="Modelo 3D de Felipe Camarão" loading="lazy"></div><div class="btnrow"><a class="btn" href="#gameplay">Ver o gameplay em VR</a></div></div></div>
+</div></section>
+
+<section id="exposicoes"><div class="in">
+<h2>EXPOSIÇÕES</h2>
+<ul class="ex">
+<li><b>Tornada</b>, DEART/UFRN, 2022</li>
+<li><b>Zeitgeist 3.0</b>, DEART/UFRN, 2022</li>
+<li><b>Entre Lugares</b>, Pinacoteca do RN, 2023</li>
+<li><b>Doce Risoflora</b>, individual, Seburubu, 2023</li>
+<li><b>EMMeio#16</b>, Museu Nacional da República, 2024</li>
+<li><b>OCAMPUS</b>, DEART/UFRN, 2025</li>
+</ul></div></section>
+
+<section id="contato"><div class="in">
+<h2>CONTATO</h2>
+<p class="lead">Encomendas, licenciamento de modelos 3D e propostas de projeto. A mensagem abre o WhatsApp.</p>
+<form id="msg"><label for="nm">Seu nome</label><input id="nm" required><label for="tx">Mensagem</label><textarea id="tx" rows="4" required></textarea><div class="btnrow"><button class="btn" type="submit">Enviar pelo WhatsApp</button></div></form>
+</div></section>
+
+<div class="strip" aria-hidden="true"><div class="track">
+<span>✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → NATAL ✶ ▲◢◣ ⇅ → ✶ ◤◥ ⇅ → ESCULTURA DIGITAL ✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → </span>
+<span>✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → NATAL ✶ ▲◢◣ ⇅ → ✶ ◤◥ ⇅ → ESCULTURA DIGITAL ✶ ⇅ ▲◢◣ → ✶ ◤◥ ⇅ → </span>
+</div></div>
+<footer><div class="in">
+<p>Vinícius Fernandes, Natal, RN. WhatsApp: (84) 99820-4677</p>
+<p>E-mail: vinicius.fernandes13@hotmail.com</p>
+<p><a href="https://www.instagram.com/vi.vini/">Instagram</a> &nbsp; <a href="https://www.youtube.com/@viniciusfernandes5629">YouTube</a> &nbsp; <a href="https://10dimensoes.com/metaversov/">Metaverso V</a></p>
+</div></footer>
+
+</div>
+
+<aside id="drawer" aria-label="Carrinho" aria-hidden="true">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3>Seu pedido</h3><button id="close" class="add">Fechar</button></div>
+<div id="items"></div>
+<div class="row"><b>Total</b><b id="total">R$ 0</b></div>
+<p style="font-size:13px;margin:8px 0">Itens “sob consulta” não entram no total.</p>
+<label for="who">Seu nome</label><input id="who"><div class="btnrow"><button class="btn" id="send" style="width:100%">Enviar pedido pelo WhatsApp</button></div>
+</aside>
+
+<main id="viewer" hidden aria-label="Visualizador 3D">
+<canvas id="stage" tabindex="0" aria-label="Modelo 3D. Arraste para girar e use dois dedos para aproximar."></canvas>
+<div class="vbar"><a class="vback" href="#loja">← Loja</a><div class="vtitle"><b id="vt"></b><span id="vs"></span></div></div>
+<div class="vstatus" id="vstatus" role="status" aria-live="polite" hidden></div>
+<p class="vhint" id="vhint" hidden>Arraste para girar. Use dois dedos para aproximar.</p>
+<p class="vinfo" id="vinfo"></p>
+<div class="vtools"><button id="vrot" type="button" aria-pressed="true">Girar sozinho</button><button id="vrt" type="button" aria-pressed="false" hidden>Ray tracing</button><button id="vwire" type="button" aria-pressed="false">Ver malha</button><button id="vpecas" type="button" hidden>Ver peças</button><button id="vmontar" type="button" hidden>Montar de novo</button><button id="vreset" type="button">Centralizar</button></div>
+</main>
+
+<main id="imerso" hidden aria-label="Visualização imersiva">
+<canvas id="stage2" tabindex="0" aria-label="Cena imersiva. Aponte o celular ou arraste para olhar ao redor."></canvas>
+<div class="vbar"><a class="vback" href="#loja">← Loja</a><div class="vtitle"><b id="imtitulo"></b><span id="imsub"></span></div></div>
+<div class="vstatus" id="imstatus" role="status" aria-live="polite" hidden></div>
+<div class="vstatus ipanel" id="ipanel" hidden>
+<p><b>Entre na cena.</b> O objeto fica em escala grande, à sua frente, num espaço virtual. Com o giroscópio, você olha ao redor movendo o celular.</p>
+<div class="btnrow"><button class="add" type="button" id="igyro">Ativar giroscópio</button><button class="add view" type="button" id="itouch">Usar o dedo</button></div>
+</div>
+<p class="vinfo" id="imode"></p>
+<div class="vtools"><button id="irecenter" type="button">Recentralizar</button><button id="irot" type="button" aria-pressed="false">Girar objeto</button><button id="igytoggle" type="button" aria-pressed="false">Giroscópio</button></div>
+</main>
+
+<section id="gameplay" hidden><div class="in">
+<p><a href="#trabalhos">← Voltar ao site</a></p>
+<h2>QUATRO MOMENTOS DA VIDA DE FELIPE CAMARÃO</h2>
+<p class="lead">Gameplay da experiência em realidade virtual (Meta Quest 3): o espectador é levado por trilhos dentro do diorama e olha ao redor. Cena 1, o ritual antropofágico tupi, até a batalha dos Guararapes.</p>
+<video id="gpv" controls playsinline preload="metadata" poster="img/gameplay-poster.jpg" aria-label="Gameplay de Quatro momentos da vida de Felipe Camarão"></video>
+<div class="btnrow"><button class="btn" type="button" id="gp1">Parte 1 · 0:00 a 5:25</button><button class="btn alt" type="button" id="gp2">Parte 2 · 5:25 ao fim</button><a class="btn alt" href="https://youtu.be/kQnVw6CT2tY" target="_blank" rel="noopener">Ver no YouTube</a></div>
+<p class="lead" style="margin-top:14px">Versão reduzida para carregar rápido. A versão completa está no YouTube.</p>
+</div></section>
+
+<section id="galeria" hidden><div class="in" id="gal"></div></section>
+
+<section id="qrview" hidden><div class="in">
+<p><a href="#loja">← Voltar ao site</a></p>
+<h2>QR CODES</h2>
+<p class="lead">Um QR code por modelo, para colar ao lado da escultura impressa. Ele abre o visualizador 3D no celular. Se o endereço do site mudar, troque abaixo e os códigos se atualizam.</p>
+<label for="base">Endereço do site</label>
+<input id="base" type="url" inputmode="url" autocomplete="off" spellcheck="false">
+<div class="qrgrid" id="qrlist"></div>
+</div></section>
+
+<script>
+const WA="5584998204677";
+/* EDITE AQUI: nome, tipo, preço (número em reais, ou null para "sob consulta"), imagem e descrição */
+/* m: nome do modelo 3D no visualizador (veja MODELS). Por enquanto todos apontam para o cubo de teste. */
+/* video (opcional): vídeo do giro, sem áudio, que toca ao abrir a galeria. fotos (opcional): lista de {src,rotulo} com a galeria do item, ex.: fotos:[{src:"img/leviathan-frente.jpg",rotulo:"Frente"},{src:"img/leviathan-lateral.jpg",rotulo:"Lateral"},{src:"img/leviathan-costas.jpg",rotulo:"Costas"}]. Sem fotos, a galeria mostra só a imagem do item. */
+const PRODUCTS=[
+{id:"clara-print",t:"Clara Camarão, escultura impressa",k:"Esculturas impressas",m:"clara-camarao",fotos:[{src:"img/clara-camarao.webp",rotulo:"Impressa"},{src:"img/clara-camarao-frente.jpg",rotulo:"Frente · modelo digital"},{src:"img/clara-camarao-lateral.jpg",rotulo:"Lateral · modelo digital"},{src:"img/clara-camarao-costas.jpg",rotulo:"Costas · modelo digital"}],p:null,img:"img/clara-camarao.webp",d:"Escultura de Clara Camarão impressa em PLA vermelho acetinado. Sob encomenda."},
+{id:"felipe-clara",t:"Felipe e Clara Camarão, escultura impressa",k:"Esculturas impressas",m:"felipe-clara",fotos:[{src:"img/felipe-clara.jpg",rotulo:"Frente"},{src:"img/felipe-clara-lateral.jpg",rotulo:"Lateral"},{src:"img/felipe-clara-costas.jpg",rotulo:"Costas"}],p:null,img:"img/felipe-clara.jpg",d:"As Cartas, capa do TCC Quatro momentos da vida de Felipe Camarão. PLA cor cobre, impressa sob encomenda."},
+{id:"leviathan",t:"Leviathan, modelo 3D",k:"Modelos 3D",m:"leviathan",video:"video/leviathan-giro.mp4",fotos:[{src:"img/leviathan-frente.jpg",rotulo:"Frente"},{src:"img/leviathan-lateral.jpg",rotulo:"Lateral"},{src:"img/leviathan-costas.jpg",rotulo:"Costas"}],p:300,img:"img/leviathan.jpg",d:"Modelo feito no Maya. Arquivo digital."},
+{id:"felipe-print",t:"Felipe Camarão, escultura impressa",k:"Esculturas impressas",m:"felipe-camarao",fotos:[{src:"img/camaraoprint.jpg",rotulo:"Impressa"},{src:"img/felipe-camarao.jpg",rotulo:"Frente"},{src:"img/felipe-camarao-lateral.jpg",rotulo:"Lateral"},{src:"img/felipe-camarao-costas.jpg",rotulo:"Costas"}],p:180,img:"img/camaraoprint.jpg",d:"PLA, 25×10×10 cm. Impressa sob encomenda."},
+{id:"monumento",t:"Apropriação de um Monumento",k:"Esculturas impressas",m:"cubo-teste",p:260,img:"img/monumento.jpg",d:"PLA, 22×30×60 cm (a menor mede 11×15×30 cm). Tem QR code para o jogo."},
+{id:"malfeitinha",t:"Malfeitinha, figura para impressão",k:"Esculturas impressas",m:"cubo-teste",p:150,img:"img/malfeitinha.jpg",d:"Personagem modelada para impressão 3D."},
+{id:"fury-3d",t:"The Fury, modelo 3D",k:"Modelos 3D",m:"cubo-teste",p:300,img:"img/fury.jpg",d:"Personagem de jogo com malha low poly e mapas de textura. Arquivo digital."},
+{id:"ecorche",t:"Écorché, estudo anatômico",k:"Modelos 3D",m:"cubo-teste",p:200,img:"img/ecorche.jpg",d:"Músculos do corpo humano modelados em 3D. Arquivo digital."},
+{id:"camarao-hp",t:"Felipe Camarão, personagem de alta resolução",k:"Modelos 3D",m:"cubo-teste",p:null,img:"img/camarao3d.jpg",d:"Modelo de alta contagem de polígonos. Preço sob consulta."},
+{id:"lavoura",t:"Lavoura, gravura",k:"Obras originais",p:null,img:"img/lavoura.jpg",d:"Gravura em linóleo, nanquim, acrílica e giz sobre papel, 14,8×21 cm. Da série Pendendo dos Ossos."},
+{id:"deriva",t:"Deriva Situada",k:"Obras originais",p:null,img:"img/deriva.jpg",d:"Acrílico e óleo sobre linho, 60×36 cm, 2023."},
+{id:"risoflora",t:"Risoflora",k:"Obras originais",p:null,img:"img/risoflora.jpg",d:"Acrílico e óleo sobre tela, 170×150 cm, 2022. Consulte disponibilidade."},
+{id:"encomenda",t:"Encomenda de modelagem 3D",k:"Encomendas",p:null,img:"img/orc.jpg",d:"Personagens, criaturas e objetos para jogos ou impressão 3D. Conte sua ideia e eu envio um orçamento."}
+];
+const $=s=>document.querySelector(s),brl=v=>"R$ "+v.toLocaleString("pt-BR");
+let cart={},filter="Tudo";
+try{cart=JSON.parse(localStorage.getItem("cart")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("cart",JSON.stringify(cart))}catch(e){}};
+function tabs(){const ks=["Tudo",...new Set(PRODUCTS.map(p=>p.k))];$("#tabs").innerHTML=ks.map(k=>`<button aria-pressed="${k===filter}" data-k="${k}">${k}</button>`).join("")}
+function grid(){$("#grid").innerHTML=PRODUCTS.filter(p=>filter==="Tudo"||p.k===filter).map(p=>`<article class="item"><a class="thumb" href="#galeria-${p.id}" aria-label="Ver fotos de ${p.t}"><img src="${p.img}" alt="${p.t}" loading="lazy"></a><div><small>${p.k}</small><h3>${p.t}</h3><p>${p.d}</p></div><div class="buy"><span class="price">${p.p?brl(p.p):"Sob consulta"}</span><span class="btns">${p.m?`<a class="add view" href="#modelo-${p.m}">Ver em 3D</a><a class="add view" href="#imerso-${p.m}">Ver Imerso</a>`:""}<button class="add" data-id="${p.id}">${p.p?"Adicionar":"Pedir orçamento"}</button></span></div></article>`).join("")}
+function render(){const ids=Object.keys(cart);$("#n").textContent=ids.reduce((a,i)=>a+cart[i],0);
+$("#items").innerHTML=ids.length?ids.map(i=>{const p=PRODUCTS.find(x=>x.id===i);return `<div class="row"><span>${cart[i]}× ${p.t}<br><small>${p.p?brl(p.p*cart[i]):"Sob consulta"}</small></span><button data-rm="${i}">Remover</button></div>`}).join(""):"<p>O carrinho está vazio. Escolha um item na loja.</p>";
+$("#total").textContent=brl(ids.reduce((a,i)=>a+(PRODUCTS.find(x=>x.id===i).p||0)*cart[i],0));save()}
+function drawer(o){const d=$("#drawer");d.classList.toggle("open",o);d.setAttribute("aria-hidden",!o)}
+document.addEventListener("click",e=>{const t=e.target;
+if(t.dataset.k){filter=t.dataset.k;tabs();grid()}
+if(t.dataset.id){cart[t.dataset.id]=(cart[t.dataset.id]||0)+1;render();drawer(true)}
+if(t.dataset.rm){delete cart[t.dataset.rm];render()}});
+$("#open").onclick=()=>drawer(true);$("#close").onclick=()=>drawer(false);
+$("#send").onclick=()=>{const ids=Object.keys(cart);if(!ids.length){$("#items").innerHTML="<p><b>Adicione ao menos um item ao carrinho.</b></p>";return}
+const lines=ids.map(i=>{const p=PRODUCTS.find(x=>x.id===i);return `• ${cart[i]}× ${p.t} (${p.p?brl(p.p*cart[i]):"sob consulta"})`});
+const msg=`Olá, Vinícius! Sou ${$("#who").value||"(nome)"} e quero fazer este pedido:\n${lines.join("\n")}\nTotal: ${$("#total").textContent}`;
+window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,"_blank")};
+$("#msg").onsubmit=e=>{e.preventDefault();window.open(`https://wa.me/${WA}?text=${encodeURIComponent("Olá, Vinícius! Sou "+$("#nm").value+". "+$("#tx").value)}`,"_blank")};
+/* MODELS: um item por modelo 3D. glb = arquivo .glb publicado junto da página. Aqui ele leva o sufixo .wasm só porque a hospedagem de artefatos não serve .glb; num domínio próprio use .glb puro. Prefira arquivos comprimidos com meshopt. */
+const MODELS={
+"clara-camarao":{titulo:"Clara Camarão",sub:"10 peças de impressão · PLA vermelho acetinado",glb:"modelos/clara-camarao.glb",material:"pla-vermelho",rt:true,escalaImersa:1.9,
+ montagem:{passo:.60,dur:1.15,alcance:.30,altura:.21,incremento:.018,
+  ordem:["pe-clara","BOLA-PE","saia","pernbola-a","BOLA-TRONCO","tronco","BOLA-BRACO1","braco-direito","BOLA-BRACO","mao-esquerda"],
+  nomes:{"pe-clara":"pé e base","BOLA-PE":"encaixe do pé","saia":"saia e pernas","pernbola-a":"encaixe da perna","BOLA-TRONCO":"encaixe do tronco","tronco":"tronco e cocar","BOLA-BRACO1":"encaixe do braço 1","braco-direito":"braço direito","BOLA-BRACO":"encaixe do braço 2","mao-esquerda":"braço esquerdo e arco"}}},
+"leviathan":{titulo:"Leviathan",sub:"8 peças de impressão · cores do render",zoom:.86,glb:"modelos/leviathan-pbr.glb.wasm",leve:"modelos/leviathan-pbr-1k.glb.wasm",
+ luz:{mapa:"modelos/leviathan-pbr-luz.jpg",mapaLeve:"modelos/leviathan-pbr-1k-luz.jpg",curva:"modelos/leviathan-pbr-curva.jpg",curvaLeve:"modelos/leviathan-pbr-1k-curva.jpg",reflexo:"modelos/leviathan-pbr-reflexo.jpg",reflexoLeve:"modelos/leviathan-pbr-1k-reflexo.jpg",max:2.2339,rmax:0.4000,mapaSolo:"modelos/leviathan-pbr-luz-solo.jpg",mapaSoloLeve:"modelos/leviathan-pbr-1k-luz-solo.jpg",curvaSolo:"modelos/leviathan-pbr-curva-solo.jpg",curvaSoloLeve:"modelos/leviathan-pbr-1k-curva-solo.jpg",reflexoSolo:"modelos/leviathan-pbr-reflexo-solo.jpg",reflexoSoloLeve:"modelos/leviathan-pbr-1k-reflexo-solo.jpg",maxSolo:2.2583,rmaxSolo:0.4468,
+  chao:"modelos/leviathan-pbr-chao.jpg",cx:0.0000,cz:0.0000,raio:4.2},
+ montagem:{passo:.6,dur:1.15,ordem:["base","pe-direito","perna-esquerda","torso","garra-caranguejo-direita","braco-esquerdo","peixe-espada-esquerdo","cabeca-tentaculos"],
+  nomes:{"base":"base com a onda","pe-direito":"pé direito","perna-esquerda":"perna esquerda","torso":"torso","garra-caranguejo-direita":"garra de caranguejo","braco-esquerdo":"braço esquerdo","peixe-espada-esquerdo":"peixe-espada","cabeca-tentaculos":"cabeça e tentáculos"}},
+ material:"pla-creme",rt:true,escalaImersa:2.4},
+"felipe-camarao":{titulo:"Felipe Camarão",sub:"Escultura impressa · PLA bege",glb:"modelos/felipe-camarao-pbr.glb.wasm",leve:"modelos/felipe-camarao-pbr-1k.glb.wasm",
+ luz:{mapa:"modelos/felipe-camarao-pbr-luz.jpg",mapaLeve:"modelos/felipe-camarao-pbr-1k-luz.jpg",curva:"modelos/felipe-camarao-pbr-curva.jpg",curvaLeve:"modelos/felipe-camarao-pbr-1k-curva.jpg",reflexo:"modelos/felipe-camarao-pbr-reflexo.jpg",reflexoLeve:"modelos/felipe-camarao-pbr-1k-reflexo.jpg",max:2.1620,rmax:0.3178,chao:"modelos/felipe-camarao-pbr-chao.jpg",cx:0.0000,cz:0.0000,raio:4.2},
+ material:"pla-bege",rt:true,escalaImersa:1.85},
+"felipe-clara":{titulo:"Felipe e Clara Camarão",sub:"As Cartas · capa do TCC · PLA cor cobre",glb:"modelos/felipe-clara-pbr.glb.wasm",leve:"modelos/felipe-clara-pbr-1k.glb.wasm",
+ luz:{mapa:"modelos/felipe-clara-pbr-luz.jpg",mapaLeve:"modelos/felipe-clara-pbr-1k-luz.jpg",curva:"modelos/felipe-clara-pbr-curva.jpg",curvaLeve:"modelos/felipe-clara-pbr-1k-curva.jpg",reflexo:"modelos/felipe-clara-pbr-reflexo.jpg",reflexoLeve:"modelos/felipe-clara-pbr-1k-reflexo.jpg",max:2.1882,rmax:0.1856,chao:"modelos/felipe-clara-pbr-chao.jpg",cx:-0.0864,cz:-0.0231,raio:4.2},
+ material:"pla-cobre",rt:true,escalaImersa:1.9},
+"cubo-teste":{titulo:"Cubo de teste",sub:"Duplo virtual de demonstração",glb:"modelos/cubo-teste.glb.wasm"}
+};
+const SITE_URL="https://vi-vini.github.io/viniverso.github.io/";
+let siteReady=false;
+function ensureSite(){if(siteReady)return;siteReady=true;tabs();grid();render()}
+function renderGallery(id){
+const p=PRODUCTS.find(x=>x.id===id),g=$("#gal");
+if(!p){g.innerHTML='<p><a href="#loja">← Voltar à loja</a></p><p>Este item não existe. Volte à loja e escolha outro.</p>';return}
+const fotos=p.fotos||[{src:p.img,rotulo:""}];
+g.innerHTML='<p><a href="#loja">← Voltar à loja</a></p><small class="gk"></small><h2 class="gt"></h2><p class="lead"></p><div class="tabs" id="gtabs" role="group" aria-label="Escolher como ver" hidden></div><div class="gvid" id="gvid" hidden></div><div class="gfotos" id="gfotos"></div><div class="gbuy"></div>';
+g.querySelector(".gk").textContent=p.k;g.querySelector(".gt").textContent=p.t;g.querySelector(".lead").textContent=p.d;
+const box=$("#gfotos");
+fotos.forEach(f=>{const fg=document.createElement("figure"),im=document.createElement("img");im.src=f.src;im.alt=p.t+(f.rotulo?", "+f.rotulo.toLowerCase():"");fg.append(im);if(f.rotulo){const c=document.createElement("figcaption");c.textContent=f.rotulo;fg.append(c)}box.append(fg)});
+if(p.video){
+ const tabsEl=$("#gtabs"),vbox=$("#gvid"),calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+ const v=document.createElement("video");v.src=p.video;v.poster=fotos[0].src;v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.preload="auto";v.setAttribute("aria-label","Giro de 360 graus de "+p.t);
+ const dica=document.createElement("p");dica.textContent="Toque no vídeo para pausar ou continuar.";
+ vbox.append(v,dica);
+ v.onclick=()=>{v.paused?v.play():v.pause()};
+ const show=mode=>{const isV=mode==="video";vbox.hidden=!isV;box.hidden=isV;tabsEl.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===mode)));if(isV){if(calm){v.controls=true}else{v.play().catch(()=>{v.controls=true})}}else v.pause()};
+ [["video","Giro"],["fotos","Fotos"]].forEach(([m,t])=>{const b=document.createElement("button");b.type="button";b.dataset.mode=m;b.textContent=t;b.onclick=()=>show(m);tabsEl.append(b)});
+ tabsEl.hidden=false;show("video")}
+g.querySelector(".gbuy").innerHTML=`<span class="price">${p.p?brl(p.p):"Sob consulta"}</span>${p.m?`<a class="add view" href="#modelo-${p.m}">Ver em 3D</a><a class="add view" href="#imerso-${p.m}">Ver Imerso</a>`:""}<button class="add" data-id="${p.id}">${p.p?"Adicionar":"Pedir orçamento"}</button>`}
+const GPV=["video/gameplay-1.mp4","video/gameplay-2.mp4"];let gpi=-1;
+function gpLoad(i,play){const v=$("#gpv");if(gpi!==i){gpi=i;v.src=GPV[i]}$("#gp1").className=i===0?"btn":"btn alt";$("#gp2").className=i===1?"btn":"btn alt";if(play)v.play().catch(()=>{})}
+function gpPause(){const v=document.querySelector("#gpv");if(v)v.pause()}
+function gpInit(){const v=$("#gpv");if(!v.dataset.ok){v.dataset.ok=1;$("#gp1").onclick=()=>gpLoad(0,true);$("#gp2").onclick=()=>gpLoad(1,true);v.addEventListener("ended",()=>{if(gpi===0)gpLoad(1,true)})}if(gpi<0)gpLoad(0,false)}
+function route(){
+const h=decodeURIComponent(location.hash.slice(1));
+const isM=h.startsWith("modelo-"),isI=h.startsWith("imerso-"),isQ=h==="qr-codes",isG=h.startsWith("galeria-"),isP=h==="gameplay";
+$("#site").hidden=isM||isI||isQ||isG||isP;$("#gameplay").hidden=!isP;if(!isP)gpPause();$("#viewer").hidden=!isM;$("#imerso").hidden=!isI;$("#qrview").hidden=!isQ;$("#galeria").hidden=!isG;if(!isG){const vv=document.querySelector("#gal video");if(vv)vv.pause()}
+if(isP){if(window.visualizador3d)window.visualizador3d.close();if(window.imersivo)window.imersivo.close();gpInit();window.scrollTo(0,0)}
+else if(isM){const id=h.slice(7);if(window.imersivo)window.imersivo.close();if(window.visualizador3d)window.visualizador3d.open(id,MODELS[id])}
+else if(isI){const id=h.slice(7);if(window.visualizador3d)window.visualizador3d.close();if(window.imersivo)window.imersivo.open(id,MODELS[id])}
+else{if(window.visualizador3d)window.visualizador3d.close();if(window.imersivo)window.imersivo.close();
+ if(isQ)renderQR();
+ else if(isG){ensureSite();renderGallery(h.slice(8));window.scrollTo(0,0)}
+ else{ensureSite();const el=h&&document.getElementById(h);if(el)el.scrollIntoView();else window.scrollTo(0,0)}}}
+addEventListener("hashchange",route);
+let qrLoad=null;
+function loadQR(){return qrLoad||(qrLoad=new Promise((ok,no)=>{if(window.qrcode)return ok();const e=document.createElement("script");e.src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";e.onload=ok;e.onerror=no;document.head.append(e)}))}
+function renderQR(){
+const inp=$("#base");if(!inp.value){let v="";try{v=localStorage.getItem("siteUrl")||""}catch(e){}inp.value=v||SITE_URL;inp.oninput=renderQR}
+const base=inp.value.trim().split("#")[0];try{localStorage.setItem("siteUrl",base)}catch(e){}
+loadQR().then(()=>{const box=$("#qrlist");box.innerHTML="";
+ Object.entries(MODELS).forEach(([id,m])=>{const url=base+"#modelo-"+id;const q=qrcode(0,"M");q.addData(url);q.make();
+  const c=document.createElement("div");c.className="qrcard";
+  c.innerHTML=`<h3></h3><div class="qrbox">${q.createSvgTag({cellSize:6,margin:4,scalable:true,alt:"QR code de "+m.titulo})}</div><code></code><div class="btns" style="justify-content:flex-start"><button class="add" type="button">Copiar endereço</button><a class="add view" href="${"#modelo-"+id}">Abrir</a></div>`;
+  c.querySelector("h3").textContent=m.titulo;c.querySelector("code").textContent=url;
+  const b=c.querySelector("button");b.onclick=()=>{const done=()=>{b.textContent="Copiado"};try{navigator.clipboard.writeText(url).then(done,()=>{const r=document.createRange();r.selectNodeContents(c.querySelector("code"));const s=getSelection();s.removeAllRanges();s.addRange(r)})}catch(e){}};
+  box.append(c)})}).catch(()=>{$("#qrlist").textContent="Não foi possível carregar o gerador de QR code. Verifique a conexão e recarregue."})}
+route();
+</script>
+
+<script type="module">
+/* Visualizador 3D. O Three.js só é baixado quando alguém abre um modelo. */
+const $=s=>document.querySelector(s),nf=n=>n.toLocaleString("pt-BR");
+// estúdio para o ray tracing: mapa de ambiente equirretangular com caixas de luz (principal, preenchimento, recorte e topo)
+function estudio(THREE){const W=512,H=256,d=new Float32Array(W*H*4),R=Math.PI/180;
+ const caixas=[[-45,38,48,32,5.2,[1,.94,.86]],[72,12,42,30,.9,[.86,.9,1]],[205,34,34,42,3.4,[1,.9,.8]],[0,84,44,44,1.1,[1,1,1]]];
+ const sst=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t)};
+ for(let j=0;j<H;j++){const lat=((j+.5)/H-.5)*Math.PI;for(let i=0;i<W;i++){const phi=((i+.5)/W-.5)*2*Math.PI,x=Math.cos(phi)*Math.cos(lat),z=Math.sin(phi)*Math.cos(lat),az=Math.atan2(x,z)/R,el=lat/R;
+  const s=Math.sin(lat),amb=s>0?.035+.03*s:.03+.012*s;let r=amb,g=amb*.62,b=amb*.52;
+  for(const [a0,e0,w,h,I,c] of caixas){let da=Math.abs(((az-a0)%360+540)%360-180);const de=Math.abs(el-e0);const k=(1-sst(w/2-4,w/2+2,da))*(1-sst(h/2-4,h/2+2,de));if(k>0){r+=I*c[0]*k;g+=I*c[1]*k;b+=I*c[2]*k}}
+  const o=(j*W+i)*4;d[o]=r;d[o+1]=g;d[o+2]=b;d[o+3]=1}}
+ const t=new THREE.DataTexture(d,W,H,THREE.RGBAFormat,THREE.FloatType);t.mapping=THREE.EquirectangularReflectionMapping;t.magFilter=t.minFilter=THREE.LinearFilter;t.generateMipmaps=false;t.needsUpdate=true;return t}
+function floatGeo(THREE,g){const n=new THREE.BufferGeometry(),get=["getX","getY","getZ","getW"];for(const k in g.attributes){const a=g.attributes[k],s=a.itemSize,f=new Float32Array(a.count*s);for(let i=0;i<a.count;i++)for(let j=0;j<s;j++)f[i*s+j]=a[get[j]](i);n.setAttribute(k,new THREE.BufferAttribute(f,s))}n.setIndex(g.index);g.dispose();return n}
+// fundo em degradê (o mesmo do traçador de raios) e chão do estúdio
+function fundo(THREE){const W=8,H=64,d=new Float32Array(W*H*4),a=new THREE.Color(0x0e0202),b=new THREE.Color(0x5c1212),c=new THREE.Color();
+ for(let j=0;j<H;j++){const y=Math.sin(((j+.5)/H-.5)*Math.PI);c.lerpColors(a,b,(y*.5+.5)**1.4);for(let i=0;i<W;i++){const o=(j*W+i)*4;d[o]=c.r;d[o+1]=c.g;d[o+2]=c.b;d[o+3]=1}}
+ const t=new THREE.DataTexture(d,W,H,THREE.RGBAFormat,THREE.FloatType);t.mapping=THREE.EquirectangularReflectionMapping;t.magFilter=t.minFilter=THREE.LinearFilter;t.wrapS=THREE.RepeatWrapping;t.needsUpdate=true;return t}
+// luz pré-calculada (protocolo de bake): a irradiância difusa do estúdio, com sombras e rebatimentos traçados na malha alta,
+// vem de uma textura. O reflexo do cobre segue em tempo real; onde a normal curvada diz que o reflexo bate na própria peça,
+// ele mostra a cor do cobre ao redor. Constantes (0.5 no cone, 1.6 no reflexo) calibradas contra o path tracer.
+function comLuz(THREE,m,lz,L,k=1){const C=THREE.ShaderChunk,a="iblIrradiance += getIBLIrradiance( geometryNormal );",b="radiance += getIBLRadiance( geometryViewDir, geometryNormal, material.roughness );",c="clearcoatRadiance += getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness );";
+ if(!C.lights_fragment_maps.includes(a)||!C.lights_fragment_maps.includes(b))return m;
+ const solo=!!lz.mpS,U={luzMapa:{value:lz.mp},luzMax:{value:L.max*k},luzCurva:{value:lz.cv},luzReflexo:{value:lz.rf},luzRMax:{value:L.rmax*1.6*k},luzMix:{value:1}};
+ if(solo){Object.assign(U,{luzMapaS:{value:lz.mpS},luzMaxS:{value:L.maxSolo*k},luzCurvaS:{value:lz.cvS},luzReflexoS:{value:lz.rfS},luzRMaxS:{value:L.rmaxSolo*1.6*k}});m.defines=Object.assign({},m.defines,{LUZ_SOLO:""})}
+ m.userData.luzU=U;
+ m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,U);
+  sh.fragmentShader=sh.fragmentShader.replace("#include <common>","#include <common>\nuniform sampler2D luzMapa,luzCurva,luzReflexo;\nuniform float luzMax,luzRMax,luzMix;\n#ifdef LUZ_SOLO\nuniform sampler2D luzMapaS,luzCurvaS,luzReflexoS;\nuniform float luzMaxS,luzRMaxS;\n#endif")
+   .replace("#include <lights_fragment_maps>","float luzOc=1.0;vec3 luzRef=vec3(0.0);\n"+C.lights_fragment_maps
+    .replace(a,`{vec3 le=luzMax*texture2D(luzMapa,vAoMapUv).rgb;
+#ifdef LUZ_SOLO
+ le=mix(luzMaxS*texture2D(luzMapaS,vAoMapUv).rgb,le,luzMix);
+#endif
+ iblIrradiance+=le*envMapIntensity;}`)
+    .replace(b,`{vec3 cv=texture2D(luzCurva,vAoMapUv).rgb*2.0-1.0;vec3 lr=luzRMax*texture2D(luzReflexo,vAoMapUv).rgb;
+#ifdef LUZ_SOLO
+ cv=mix(texture2D(luzCurvaS,vAoMapUv).rgb*2.0-1.0,cv,luzMix);lr=mix(luzRMaxS*texture2D(luzReflexoS,vAoMapUv).rgb,lr,luzMix);
+#endif
+ float vis=clamp(length(cv),0.0,1.0);
+#ifdef USE_NORMALMAP_TANGENTSPACE
+ vec3 bv=normalize(tbn*cv+1e-5);
+#else
+ vec3 bv=geometryNormal;
+#endif
+ vec3 rr=reflect(-geometryViewDir,geometryNormal);float cc=sqrt(1.0-vis),lb=0.12+0.5*material.roughness;
+ luzOc=smoothstep(cc*0.5-lb,cc*0.5+lb,dot(rr,bv));luzRef=lr*envMapIntensity;
+ radiance+=mix(luzRef,getIBLRadiance(geometryViewDir,geometryNormal,material.roughness),luzOc);}`)
+    .replace(c,"clearcoatRadiance += mix(luzRef,getIBLRadiance( geometryViewDir, geometryClearcoatNormal, material.clearcoatRoughness ),luzOc);"))
+   .replace("#include <aomap_fragment>","")};
+ m.customProgramCacheKey=()=>"luz-bake-3"+(solo?"s":"");m.userData.luz=true;return m}
+// troca o material do GLB pelo material com nome, mantendo as texturas do bake (normal e AO)
+function vestir(THREE,root,nome){root.traverse(o=>{if(!o.isMesh)return;const src=o.material,m=materialDe(THREE,nome);if(!m)return;
+ if(src.normalMap){m.normalMap=src.normalMap;m.normalScale.copy(src.normalScale)}if(src.aoMap){m.aoMap=src.aoMap;m.aoMapIntensity=1}
+ if(src.map){m.map=src.map;m.color.set(0xffffff)}o.material=m})}
+async function carregaLuz(THREE,cfg,leve){const tl=new THREE.TextureLoader(),L=cfg.luz,v=n=>leve&&L[n+"Leve"]||L[n];
+ const so=!!L.mapaSolo,[mp,cv,rf,ch,mpS,cvS,rfS]=await Promise.all([tl.loadAsync(v("mapa")),tl.loadAsync(v("curva")),tl.loadAsync(v("reflexo")),tl.loadAsync(L.chao),so?tl.loadAsync(v("mapaSolo")):null,so?tl.loadAsync(v("curvaSolo")):null,so?tl.loadAsync(v("reflexoSolo")):null]);
+ for(const t of [mp,cv,rf,mpS,cvS,rfS])if(t){t.flipY=false;t.anisotropy=4}mp.colorSpace=rf.colorSpace=THREE.SRGBColorSpace;if(so)mpS.colorSpace=rfS.colorSpace=THREE.SRGBColorSpace;return{mp,cv,rf,ch,mpS,cvS,rfS}}
+function decalChao(THREE,ch,L){const m=new THREE.Mesh(new THREE.PlaneGeometry(2*L.raio,2*L.raio),new THREE.MeshBasicMaterial({color:0,alphaMap:ch,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+ m.rotation.x=-Math.PI/2;m.position.set(L.cx,.004,L.cz);m.renderOrder=1;m.userData.decal=true;return m}
+// materiais com nome: a escultura impressa em PLA cor cobre
+function materialDe(THREE,nome){if(nome==="pla-vermelho")return new THREE.MeshPhysicalMaterial({color:0xa60935,metalness:0,roughness:.32,clearcoat:.15,clearcoatRoughness:.35});
+ if(nome==="pla-cobre")return new THREE.MeshPhysicalMaterial({color:0xa8643a,metalness:.55,roughness:.38,clearcoat:.2,clearcoatRoughness:.35});
+ if(nome==="pla-creme")return new THREE.MeshPhysicalMaterial({color:0xd8c6a8,metalness:0,roughness:.5});
+ if(nome==="pla-bege")return new THREE.MeshPhysicalMaterial({color:0xc89770,metalness:0,roughness:.5});return null}
+function voltar(sel,cfg){const a=document.querySelector(sel+" .vback");if(cfg&&cfg.voltar){a.href=cfg.voltar;a.textContent="← Início"}else{a.href="#loja";a.textContent="← Loja"}}
+let S=null,active=false;
+function status(msg,retry){const el=$("#vstatus");el.hidden=!msg;el.replaceChildren();if(!msg)return;const p=document.createElement("span");p.textContent=msg;el.append(p);if(retry){const b=document.createElement("button");b.className="add";b.type="button";b.textContent="Tentar de novo";b.onclick=retry;el.append(b)}}
+async function init(){
+const [THREE,{OrbitControls},{RoomEnvironment},{GLTFLoader},{MeshoptDecoder}]=await Promise.all([import("three"),import("three/addons/controls/OrbitControls.js"),import("three/addons/environments/RoomEnvironment.js"),import("three/addons/loaders/GLTFLoader.js"),import("three/addons/libs/meshopt_decoder.module.js")]);
+const canvas=$("#stage"),host=$("#viewer");
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:"high-performance"})}catch(e){throw new Error("webgl")}
+const weak=(navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=2;
+let pr=Math.min(window.devicePixelRatio||1,weak?1.5:2);
+renderer.setPixelRatio(pr);renderer.setClearColor(0x000000,0);
+renderer.toneMapping=THREE.NeutralToneMapping;
+const scene=new THREE.Scene();
+const pm=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();
+const roomEnv=pm.fromScene(room,.04).texture;scene.environment=roomEnv;scene.environmentIntensity=.7;room.dispose();pm.dispose();
+const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(2,3,2);scene.add(key);
+const camera=new THREE.PerspectiveCamera(35,1,.01,100);
+const controls=new OrbitControls(camera,canvas);
+controls.enableDamping=true;controls.dampingFactor=.09;controls.enablePan=false;controls.rotateSpeed=.85;controls.autoRotateSpeed=2.2;
+const calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
+controls.autoRotate=!calm;
+const btnRot=$("#vrot"),btnWire=$("#vwire"),btnReset=$("#vreset");
+const setRot=v=>{controls.autoRotate=v;btnRot.setAttribute("aria-pressed",String(v));request()};
+btnRot.setAttribute("aria-pressed",String(!calm));
+controls.addEventListener("start",()=>{if(controls.autoRotate)setRot(false);$("#vhint").hidden=true});
+// sombra de contato falsa (um disco com gradiente, sem custo de sombra em tempo real)
+const sc=document.createElement("canvas");sc.width=sc.height=128;const g=sc.getContext("2d").createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,"rgba(0,0,0,.55)");g.addColorStop(1,"rgba(0,0,0,0)");const cx=sc.getContext("2d");cx.fillStyle=g;cx.fillRect(0,0,128,128);
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(sc),transparent:true,depthWrite:false}));
+shadow.rotation.x=-Math.PI/2;shadow.position.y=.002;scene.add(shadow);
+let raf=0,lastT=0,slow=0,holder=null,mats=[],tris=0,radius=1,tgt=new THREE.Vector3(),wire=false,dims=new THREE.Vector3(1,1,1),zoomCfg=0;
+// ray tracing (three-gpu-pathtracer): só é baixado quando um modelo pede. Enquanto a câmera se move, mostra a versão rápida.
+let RT=null,rtCfg=false,rtOn=false,EST=null,luzCfg=false,decal=null;const btnRT=$("#vrt"),MAXS=weak?160:600,DN=weak?48:96;
+async function rtSetup(){if(RT)return RT;const PT=await import("three-gpu-pathtracer");const pt=new PT.WebGLPathTracer(renderer);
+ pt.tiles.set(weak?3:2,weak?3:2);pt.minSamples=weak?2:3;pt.renderDelay=120;pt.fadeDuration=350;pt.bounces=weak?3:4;pt.filterGlossyFactor=.5;
+ pt.textureSize.set(weak?1024:2048,weak?1024:2048);
+ // remove o ruído das primeiras amostras com um filtro que preserva bordas; some aos poucos conforme as amostras acumulam
+ const dn=new PT.DenoiseMaterial({map:null,transparent:true,premultipliedAlpha:renderer.getContextAttributes().premultipliedAlpha});
+ pt.renderToCanvasCallback=(target,r,quad)=>{const ac=r.autoClear;r.autoClear=false;const n=pt.samples;
+  if(n<DN){const q=quad.material;dn.map=target.texture;dn.opacity=q.opacity;dn.blending=q.blending;dn.uniforms.sigma.value=Math.max(.6,3.2*(1-n/DN));dn.uniforms.kSigma.value=1.4;dn.uniforms.threshold.value=.12;quad.material=dn;quad.render(r);quad.material=q}
+  else quad.render(r);r.autoClear=ac};
+ RT={pt,ready:false};return RT}
+function estudioLiga(){if(!EST){const floor=new THREE.Mesh(new THREE.CircleGeometry(40,96),new THREE.MeshStandardMaterial({color:0x2a0a08,roughness:.74,metalness:0}));floor.rotation.x=-Math.PI/2;scene.add(floor);EST={env:estudio(THREE),bg:fundo(THREE),floor}}
+ scene.environment=EST.env;scene.environmentIntensity=1.3;scene.background=EST.bg;renderer.toneMappingExposure=1.2;key.visible=false;shadow.visible=false;EST.floor.visible=true}
+async function rtLiga(){const R=await rtSetup();if(!rtOn||!rtCfg)return;R.ready=false;info();await new Promise(r=>setTimeout(r,60));if(!rtOn||!rtCfg)return;
+ R.pt.renderScale=Math.min(1,(weak?1:1.5)/pr);if(decal)decal.visible=false;const fm=EST&&EST.floor.material;if(fm)fm.roughness=.82;R.pt.setScene(scene,camera);if(fm)fm.roughness=.74;if(decal)decal.visible=true;R.ready=true;R.pt.updateCamera();info();request()}
+const usaRT=()=>rtCfg&&rtOn&&!wire&&RT&&RT.ready;
+// montagem animada das peças de impressão: cada peça entra voando, girando em torno do próprio centro, na ordem de encaixe
+let mont=null;const btnMont=$("#vmontar");
+const eo=x=>1-Math.pow(1-x,3),eoBack=x=>{const c=1.3;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+function montPrepara(root,M){root.updateMatrixWorld(true);const pcs=[];root.traverse(o=>{if(o.isMesh&&!o.userData.decal)pcs.push(o)});
+ const ord=M.ordem||[];pcs.sort((a,b)=>ord.indexOf(a.name)-ord.indexOf(b.name));
+ const tot=new THREE.Box3(),it=pcs.map(o=>{o.geometry.computeBoundingBox();const b=o.geometry.boundingBox.clone().applyMatrix4(o.matrix);tot.union(b);return{o,b}});
+ const cg=tot.getCenter(new THREE.Vector3()),S=tot.getSize(new THREE.Vector3()),L=Math.max(S.x,S.y,S.z),passo=M.passo||.55,dur=M.dur||1.1;
+ const ps=it.map(({o,b},i)=>{const c=b.getCenter(new THREE.Vector3()),d=new THREE.Vector3(c.x-cg.x,0,c.z-cg.z);if(d.lengthSq()<1e-8)d.set(Math.sin(i*2.4),0,Math.cos(i*2.4));d.normalize();
+  const off=i===0?new THREE.Vector3(0,L*.16,0):d.clone().multiplyScalar(L*(M.alcance??.42)).add(new THREE.Vector3(0,L*((M.altura??.3)+(M.incremento??.04)*i),0));
+  const ax=i===0?new THREE.Vector3(1,0,0):new THREE.Vector3(-d.z,0,d.x).normalize();
+  return{o,c,p0:o.position.clone(),q0:o.quaternion.clone(),s0:o.scale.clone(),off,ax,ang:i===0?0:.9,t0:i*passo,nome:(M.nomes||{})[o.name]||o.name}});
+ return{t:0,ativo:false,pcs:ps,dur,fim:(ps.length-1)*passo+dur,feito:0,atual:null}}
+const _q=new THREE.Quaternion(),_v=new THREE.Vector3();
+function montPose(m){let feito=0,atual=null;
+ for(const p of m.pcs){const x=Math.min(1,Math.max(0,(m.t-p.t0)/m.dur));if(x>=1)feito++;else if(x>0)atual=p;
+  const f=.85+.15*eo(x);p.o.visible=!m.ativo||m.t>=p.t0;
+  _q.setFromAxisAngle(p.ax,p.ang*(1-eo(x)));p.o.quaternion.copy(_q).multiply(p.q0);p.o.scale.copy(p.s0).multiplyScalar(f);
+  _v.copy(p.p0).sub(p.c).applyQuaternion(_q).multiplyScalar(f).add(p.c);p.o.position.copy(_v).addScaledVector(p.off,1-eoBack(x));
+  const U=p.o.material.userData.luzU;if(U)U.luzMix.value=m.ativo?Math.min(1,Math.max(0,(x-.82)/.18)):1}
+ if(decal)decal.material.opacity=Math.min(1,feito/m.pcs.length);m.feito=feito;m.atual=atual}
+function montInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false}mont.t=0;mont.ativo=true;montPose(mont);info();request()}
+function montFim(){if(!mont)return;mont.t=mont.fim;mont.ativo=false;montPose(mont);info()}
+let vp=null;const btnPecas=$("#vpecas"),_c=new THREE.Vector3();
+function vpMostra(i){mont.pcs.forEach((p,k)=>{p.o.visible=k===i;const U=p.o.material.userData.luzU;if(U)U.luzMix.value=k===i?0:1});
+ const o=mont.pcs[i].o;o.updateWorldMatrix(true,false);o.geometry.computeBoundingSphere();const sp=o.geometry.boundingSphere.clone().applyMatrix4(o.matrixWorld);vp.c.copy(sp.center);vp.r=sp.radius;vp.i=i;info()}
+function vpCam(){const a=vp.a0+2*Math.PI*((vp.t%vp.dur)/vp.dur),e=.3,v=THREE.MathUtils.degToRad(camera.fov),hf=2*Math.atan(Math.tan(v/2)*camera.aspect),d=vp.r/Math.sin(Math.min(v,hf)/2)*1.02;
+ camera.position.set(vp.c.x+Math.sin(a)*Math.cos(e)*d,vp.c.y+Math.sin(e)*d,vp.c.z+Math.cos(a)*Math.cos(e)*d);camera.lookAt(vp.c);controls.target.copy(vp.c)}
+function vpSai(){if(!vp)return;vp=null;controls.enabled=true;btnPecas.textContent="Ver peças";if(decal)decal.visible=true;if(mont)mont.pcs.forEach(p=>{p.o.visible=true;const U=p.o.material.userData.luzU;if(U)U.luzMix.value=1});frameCam()}
+function pecasInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false}montFim();
+ vp={t:0,i:-1,n:mont.pcs.length,dur:4,a0:-.7,c:new THREE.Vector3(),r:1};controls.enabled=false;btnPecas.textContent="Pular";if(decal)decal.visible=false;vpMostra(0);vpCam();request()}
+const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+function info(){$("#vinfo").textContent=!holder?"":vp&&vp.i>=0?`Peça ${vp.i+1} de ${vp.n}: ${mont.pcs[vp.i].nome}`:mont&&mont.ativo?`Montando: ${(mont.atual||mont.pcs[0]).nome} · peça ${mont.pcs.indexOf(mont.atual||mont.pcs[0])+1} de ${mont.pcs.length}`:rtCfg&&rtOn&&!wire?(RT&&RT.ready?`Ray tracing · ${nf(RT.pt.samples|0)} amostras · ${nf(tris)} triângulos`:"Preparando o ray tracing…"):luzCfg?`Luz pré-calculada · ${nf(tris)} triângulos · ${pr}× de resolução`:`${nf(tris)} triângulos · ${renderer.capabilities.isWebGL2?"WebGL 2":"WebGL 1"} · ${pr}× de resolução`}
+function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();request()}
+function frameCam(){const v=THREE.MathUtils.degToRad(camera.fov),hf=2*Math.atan(Math.tan(v/2)*camera.aspect);
+const dist=zoomCfg?Math.max(dims.y/2/Math.tan(v/2),dims.x/2/Math.tan(hf/2))/zoomCfg+dims.z/2:radius/Math.sin(Math.min(v,hf)/2)*1.3;   // zoom: enquadramento justo (só nos modelos que pedem)
+camera.position.copy(tgt).add(new THREE.Vector3(.8,.45,1).normalize().multiplyScalar(dist));controls.target.copy(tgt);controls.minDistance=Math.min(radius*1.25,dist*.4);controls.maxDistance=dist*2.5;controls.update();request()}
+function request(){if(active&&!raf)raf=requestAnimationFrame(tick)}
+function tick(t){raf=0;if(!active)return;const dt=Math.min(.1,(t-lastT)/1000||.016);
+if(vp){vp.t+=dt;const i=Math.floor(vp.t/vp.dur);if(i>=vp.n){vpSai();montInicia()}else{if(i!==vp.i)vpMostra(i);vpCam()}}else controls.update(dt);let mais=false;
+if(mont&&mont.ativo){mont.t+=dt;if(mont.t>=mont.fim)montFim();else{montPose(mont);if(((t/250)|0)!==((lastT/250)|0))info()}}
+if(usaRT()){RT.pt.renderSample();mais=RT.pt.samples<MAXS;if(((t/400)|0)!==((lastT/400)|0))info()}else renderer.render(scene,camera);
+// qualidade adaptativa: se o aparelho passar de ~30 ms por quadro, reduz a resolução
+if(lastT&&t-lastT<250&&!usaRT()){if(t-lastT>34){if(++slow>=24&&pr>1){pr=Math.max(1,pr-.5);renderer.setPixelRatio(pr);size();info();slow=0}}else slow=Math.max(0,slow-1)}
+lastT=t;if(controls.autoRotate||mais||(mont&&mont.ativo)||vp)request()}
+controls.addEventListener("change",()=>{if(usaRT())RT.pt.updateCamera();request()});
+new ResizeObserver(size).observe(host);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)request()});
+canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();status("O aparelho pausou o gráfico 3D. Volte para esta tela para continuar.")});
+canvas.addEventListener("webglcontextrestored",()=>{status("");request()});
+btnRot.onclick=()=>setRot(!controls.autoRotate);
+btnWire.onclick=()=>{wire=!wire;btnWire.setAttribute("aria-pressed",String(wire));mats.forEach(m=>{m.wireframe=wire});if(usaRT())RT.pt.reset();info();request()};
+btnRT.onclick=()=>{rtOn=!rtOn;btnRT.setAttribute("aria-pressed",String(rtOn));if(rtOn){vpSai();if(mont&&mont.ativo)montFim();if(controls.autoRotate)setRot(false);rtLiga()}else if(RT)RT.ready=false;info();request()};
+btnReset.onclick=()=>frameCam();
+btnMont.onclick=()=>{vpSai();montInicia()};
+btnPecas.onclick=()=>{if(vp){vpSai();montInicia()}else pecasInicia()};
+function clear(){if(!holder)return;scene.remove(holder);holder.traverse(o=>{if(o.isMesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{for(const k in m){if(m[k]&&m[k].isTexture)m[k].dispose()}m.dispose()})}});holder=null;mats=[]}
+let seq=0;
+async function show(cfg){const meu=++seq;
+clear();mont=null;if(vp){vp=null;controls.enabled=true;btnPecas.textContent="Ver peças"}
+const leve=weak&&!!cfg.leve;if(RT)RT.ready=false;
+const [gltf,lz]=await Promise.all([loader.loadAsync(leve?cfg.leve:cfg.glb),cfg.luz?carregaLuz(THREE,cfg,leve):null]);
+if(meu!==seq)return;   // outra peça foi aberta enquanto esta carregava
+clear();
+const root=gltf.scene,box=new THREE.Box3().setFromObject(root),sz=box.getSize(new THREE.Vector3()),c=box.getCenter(new THREE.Vector3());
+root.position.sub(c);
+if(cfg.material)vestir(THREE,root,cfg.material);
+luzCfg=!!lz;decal=null;
+if(lz){root.traverse(o=>{if(o.isMesh&&o.material.aoMap)comLuz(THREE,o.material,lz,cfg.luz)});decal=decalChao(THREE,lz.ch,cfg.luz);gltf.scene.add(decal)}
+if(cfg.rt)root.traverse(o=>{if(o.isMesh)o.geometry=floatGeo(THREE,o.geometry)});   // o traçador de raios precisa de posições em ponto flutuante (o meshopt quantiza)
+const k=1/Math.max(sz.x,sz.y,sz.z),h=new THREE.Group();h.add(root);h.scale.setScalar(k);h.position.y=sz.y*k/2;
+tris=0;const set=new Set();
+root.traverse(o=>{if(o.isMesh&&!o.userData.decal){const gm=o.geometry;tris+=(gm.index?gm.index.count:gm.attributes.position.count)/3;(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{m.wireframe=wire;set.add(m)})}});
+mats=[...set];holder=h;scene.add(h);
+shadow.scale.setScalar(Math.max(sz.x,sz.z)*k*2.6);
+radius=.5*Math.hypot(sz.x,sz.y,sz.z)*k;tgt.set(0,sz.y*k/2,0);dims.set(Math.max(sz.x,sz.z)*k*1.08,sz.y*k,Math.min(sz.x,sz.z)*k);zoomCfg=cfg.zoom||0;
+rtCfg=!!cfg.rt;btnRT.hidden=!rtCfg;host.classList.toggle("vrt-on",rtCfg);
+if(rtCfg||luzCfg)estudioLiga();
+else{scene.environment=roomEnv;scene.environmentIntensity=.7;scene.background=null;renderer.toneMappingExposure=1;key.visible=true;shadow.visible=true;if(EST)EST.floor.visible=false}
+mont=cfg.montagem?montPrepara(root,cfg.montagem):null;btnMont.hidden=btnPecas.hidden=!mont;
+size();frameCam();
+if(mont){if(calm)montFim();else montInicia()}
+info();
+if(rtCfg&&rtOn&&!(mont&&mont.ativo)){if(controls.autoRotate)setRot(false);rtLiga()}}
+return{show,request,size}}
+window.visualizador3d={
+async open(id,cfg){
+active=true;voltar("#viewer",cfg);$("#vt").textContent=cfg?cfg.titulo:"Modelo não encontrado";$("#vs").textContent=cfg?cfg.sub:"";$("#vhint").hidden=true;
+if(!cfg){status("Este modelo não existe. Volte à loja e escolha outro.");return}
+try{status("Carregando o modelo…");
+if(!S){try{S=await init()}catch(e){console.error("visualizador:",e);status(e.message==="webgl"?"Este aparelho ou navegador não conseguiu iniciar o gráfico 3D. Tente abrir o link no Chrome ou no Safari.":"Não foi possível carregar o visualizador. Verifique a conexão e tente de novo.",()=>window.visualizador3d.open(id,cfg));return}}
+if(!active)return;
+await S.show(cfg);if(!active)return;status("");$("#vhint").hidden=false;S.size();S.request()}
+catch(e){console.error("modelo:",e);status("Não foi possível carregar o arquivo do modelo. Tente de novo em instantes.",()=>window.visualizador3d.open(id,cfg))}},
+close(){active=false}};
+/* Modo imersivo: ambiente virtual, objeto em escala grande à frente, câmera controlada pelo giroscópio (ou pelo dedo). */
+let I=null,iActive=false;
+function istatus(msg,retry){const el=$("#imstatus");el.hidden=!msg;el.replaceChildren();if(!msg)return;const p=document.createElement("span");p.textContent=msg;el.append(p);if(retry){const b=document.createElement("button");b.className="add";b.type="button";b.textContent="Tentar de novo";b.onclick=retry;el.append(b)}}
+async function iinit(){
+const [THREE,{RoomEnvironment},{GLTFLoader},{MeshoptDecoder}]=await Promise.all([import("three"),import("three/addons/environments/RoomEnvironment.js"),import("three/addons/loaders/GLTFLoader.js"),import("three/addons/libs/meshopt_decoder.module.js")]);
+const canvas=$("#stage2"),host=$("#imerso");
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"high-performance"})}catch(e){throw new Error("webgl")}
+const weak=(navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=2;
+let pr=Math.min(window.devicePixelRatio||1,weak?1.5:2);
+renderer.setPixelRatio(pr);renderer.toneMapping=THREE.NeutralToneMapping;
+const scene=new THREE.Scene();
+const pm=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();
+scene.environment=pm.fromScene(room,.04).texture;scene.environmentIntensity=.7;room.dispose();pm.dispose();
+const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(2,5,1);scene.add(key);
+const camera=new THREE.PerspectiveCamera(70,1,.05,150);camera.position.set(0,1.6,0);
+// céu em gradiente (cores do site); a metade de baixo da esfera é o chão escuro, com uma grade de 1 m
+const sk=document.createElement("canvas");sk.width=2;sk.height=256;const sx=sk.getContext("2d"),sg=sx.createLinearGradient(0,0,0,256);
+sg.addColorStop(0,"#10030a");sg.addColorStop(.42,"#6a0c0c");sg.addColorStop(.5,"#b41414");sg.addColorStop(.52,"#3a0808");sg.addColorStop(1,"#1a0505");sx.fillStyle=sg;sx.fillRect(0,0,2,256);
+const skyTex=new THREE.CanvasTexture(sk);skyTex.colorSpace=THREE.SRGBColorSpace;
+const sky=new THREE.Mesh(new THREE.SphereGeometry(90,32,16),new THREE.MeshBasicMaterial({map:skyTex,side:THREE.BackSide,depthWrite:false,toneMapped:false}));sky.position.copy(camera.position);scene.add(sky);
+const grid=new THREE.GridHelper(40,40,0xffa500,0xffa500);grid.material.transparent=true;grid.material.opacity=.16;grid.material.toneMapped=false;scene.add(grid);
+sky.renderOrder=-3;grid.renderOrder=-1;grid.material.depthWrite=false;
+const sc=document.createElement("canvas");sc.width=sc.height=128;const sx2=sc.getContext("2d"),sg2=sx2.createRadialGradient(64,64,0,64,64,64);sg2.addColorStop(0,"rgba(0,0,0,.6)");sg2.addColorStop(1,"rgba(0,0,0,0)");sx2.fillStyle=sg2;sx2.fillRect(0,0,128,128);
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(sc),transparent:true,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.003;scene.add(shadow);
+const plinth=new THREE.Mesh(new THREE.CylinderGeometry(.5,.52,.08,64),new THREE.MeshStandardMaterial({color:0x1a0505,roughness:.55,metalness:.1}));plinth.position.y=.04;scene.add(plinth);
+// estado de controle
+const Y=new THREE.Vector3(0,1,0),X=new THREE.Vector3(1,0,0),zee=new THREE.Vector3(0,0,1);
+const eul=new THREE.Euler(),q0=new THREE.Quaternion(),q1=new THREE.Quaternion(-Math.sqrt(.5),0,0,Math.sqrt(.5)),qDev=new THREE.Quaternion(),qa=new THREE.Quaternion(),qb=new THREE.Quaternion();
+let gyro=false,got=false,needCal=false,yawOff=0,dragYaw=0,dragPitch=0,spin=false,holder=null,raf=0,lastT=0,slow=0,wake=null;
+const mode=$("#imode"),bGy=$("#igytoggle"),bRot=$("#irot");
+const setMode=t=>{mode.textContent=t};
+function applyCam(){
+ if(gyro){qa.setFromAxisAngle(Y,yawOff+dragYaw);camera.quaternion.copy(qa).multiply(qDev)}
+ else{eul.set(dragPitch,dragYaw,0,"YXZ");camera.quaternion.setFromEuler(eul)}}
+function calibrate(){ // coloca o objeto na frente de onde o aparelho aponta agora
+ const f=new THREE.Vector3(0,0,-1).applyQuaternion(qDev);yawOff=-Math.atan2(-f.x,-f.z);dragYaw=0}
+function onOrient(e){
+ if(e.alpha==null||e.beta==null||e.gamma==null)return;
+ got=true;const d=THREE.MathUtils.degToRad,ang=(screen.orientation&&typeof screen.orientation.angle==="number")?screen.orientation.angle:(window.orientation||0);
+ eul.set(d(e.beta),d(e.alpha),-d(e.gamma),"YXZ");qDev.setFromEuler(eul).multiply(q1).multiply(q0.setFromAxisAngle(zee,-d(ang)));
+ if(needCal){calibrate();needCal=false}request()}
+function gyroOff(){removeEventListener("deviceorientation",onOrient);gyro=false;got=false;bGy.setAttribute("aria-pressed","false")}
+async function gyroOn(){
+ istatus("");
+ try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==="function"){const r=await DeviceOrientationEvent.requestPermission();if(r!=="granted"){setMode("Permissão do giroscópio negada. Arraste o dedo para olhar ao redor.");return false}}}
+ catch(e){setMode("Permissão do giroscópio negada. Arraste o dedo para olhar ao redor.");return false}
+ got=false;needCal=true;addEventListener("deviceorientation",onOrient);
+ await new Promise(r=>setTimeout(r,1500));
+ if(!got){removeEventListener("deviceorientation",onOrient);needCal=false;setMode("Este aparelho ou esta hospedagem não enviou dados do giroscópio. Arraste o dedo para olhar ao redor.");return false}
+ gyro=true;bGy.setAttribute("aria-pressed","true");setMode("Giroscópio ativo. Mova o celular para olhar ao redor. Arrastar o dedo ajusta a direção.");request();return true}
+function stopWake(){try{if(wake){wake.release();wake=null}}catch(e){}}
+// toque: arrastar para olhar
+let pid=null,px=0,py=0;
+canvas.addEventListener("pointerdown",e=>{pid=e.pointerId;px=e.clientX;py=e.clientY;try{canvas.setPointerCapture(pid)}catch(_){}});
+canvas.addEventListener("pointermove",e=>{if(e.pointerId!==pid)return;const k=.0045*(camera.fov/70);dragYaw+=(e.clientX-px)*k;if(!gyro)dragPitch=Math.max(-1.3,Math.min(1.3,dragPitch+(e.clientY-py)*k));px=e.clientX;py=e.clientY;request()});
+const up=e=>{if(e.pointerId===pid)pid=null};canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",up);
+function request(){if(iActive&&!raf)raf=requestAnimationFrame(tick)}
+function tick(t){raf=0;if(!iActive)return;const dt=Math.min(.1,(t-lastT)/1000||.016);
+ if(spin&&holder)holder.rotation.y+=dt*.35;
+ applyCam();renderer.render(scene,camera);
+ if(lastT&&t-lastT<250){if(t-lastT>34){if(++slow>=24&&pr>1){pr=Math.max(1,pr-.5);renderer.setPixelRatio(pr);size();slow=0}}else slow=Math.max(0,slow-1)}
+ lastT=t;if(gyro||spin)request()}
+function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.fov=camera.aspect<1?78:68;camera.updateProjectionMatrix();request()}
+new ResizeObserver(size).observe(host);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){request();if(iActive&&gyro&&navigator.wakeLock)navigator.wakeLock.request("screen").then(w=>{wake=w}).catch(()=>{})}});
+canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();istatus("O aparelho pausou o gráfico 3D. Volte para esta tela para continuar.")});
+canvas.addEventListener("webglcontextrestored",()=>{istatus("");request()});
+$("#irecenter").onclick=()=>{if(gyro)calibrate();else{dragYaw=0;dragPitch=0}request()};
+bRot.onclick=()=>{spin=!spin;bRot.setAttribute("aria-pressed",String(spin));request()};
+bGy.onclick=async()=>{if(gyro){gyroOff();dragYaw=0;dragPitch=0;setMode("Modo toque: arraste o dedo para olhar ao redor.");request()}else{await gyroOn()}};
+function begin(){ // chamado por um toque do usuário
+ try{if(host.requestFullscreen)host.requestFullscreen({navigationUI:"hide"}).catch(()=>{})}catch(e){}
+ try{if(navigator.wakeLock)navigator.wakeLock.request("screen").then(w=>{wake=w}).catch(()=>{})}catch(e){}}
+$("#igyro").onclick=async()=>{begin();$("#ipanel").hidden=true;await gyroOn();request()};
+$("#itouch").onclick=()=>{begin();$("#ipanel").hidden=true;setMode("Modo toque: arraste o dedo para olhar ao redor.");request()};
+const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+function clear(){if(!holder)return;scene.remove(holder);holder.traverse(o=>{if(o.isMesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{for(const k in m){if(m[k]&&m[k].isTexture)m[k].dispose()}m.dispose()})}});holder=null}
+let iseq=0;
+async function show(cfg){
+ const meu=++iseq;clear();const leve=weak&&!!cfg.leve;const [gltf,lz]=await Promise.all([loader.loadAsync(leve?cfg.leve:cfg.glb),cfg.luz?carregaLuz(THREE,cfg,leve):null]);
+ if(meu!==iseq)return;clear();
+ const root=gltf.scene,box=new THREE.Box3().setFromObject(root),sz=box.getSize(new THREE.Vector3()),c=box.getCenter(new THREE.Vector3());
+ root.position.sub(c);
+ if(cfg.material)vestir(THREE,root,cfg.material);
+ if(lz)root.traverse(o=>{if(o.isMesh&&o.material.aoMap)comLuz(THREE,o.material,lz,cfg.luz,1.6)});
+ const H=cfg.escalaImersa||2.4,k=H/Math.max(sz.x,sz.y,sz.z),wid=Math.max(sz.x,sz.z)*k,dist=Math.max(3,H*1.35,wid*2),plH=.08;
+ const h=new THREE.Group();h.add(root);h.scale.setScalar(k);h.position.set(0,plH+sz.y*k/2,-dist);holder=h;scene.add(h);
+ const foot=Math.max(sz.x,sz.z)*k;plinth.scale.set(foot*1.3+.2,1,foot*1.3+.2);plinth.position.set(0,.04,-dist);
+ shadow.scale.setScalar(foot*3);shadow.position.set(0,.003,-dist);
+ size();request()}
+return{show,request,size,reset(){gyroOff();stopWake();dragYaw=0;dragPitch=0;spin=false;bRot.setAttribute("aria-pressed","false");setMode("")},hasGyro:()=>gyro}}
+window.imersivo={
+async open(id,cfg){
+ iActive=true;voltar("#imerso",cfg);$("#imtitulo").textContent=cfg?cfg.titulo:"Modelo não encontrado";$("#imsub").textContent=cfg?"Modo imersivo":"";$("#ipanel").hidden=true;
+ if(!cfg){istatus("Este modelo não existe. Volte à loja e escolha outro.");return}
+ try{istatus("Carregando a cena…");
+  if(!I){try{I=await iinit()}catch(e){console.error("imersivo:",e);istatus(e.message==="webgl"?"Este aparelho ou navegador não conseguiu iniciar o gráfico 3D. Tente abrir o link no Chrome ou no Safari.":"Não foi possível carregar a cena. Verifique a conexão e tente de novo.",()=>window.imersivo.open(id,cfg));return}}
+  if(!iActive)return;I.reset();
+  await I.show(cfg);if(!iActive)return;istatus("");$("#ipanel").hidden=false;I.size();I.request()}
+ catch(e){console.error("modelo imersivo:",e);istatus("Não foi possível carregar o arquivo do modelo. Tente de novo em instantes.",()=>window.imersivo.open(id,cfg))}},
+close(){iActive=false;if(I)I.reset();try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}};
+route();
+</script>
+
+
+</body></html>
