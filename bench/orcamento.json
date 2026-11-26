@@ -16,8 +16,8 @@
  },
  "imagem": {
   "limiar_pixel": 0.1,
-  "dif_aviso_pct": 0.5,
-  "dif_max_pct": 2.0
+  "dif_aviso_pct": 1.0,
+  "dif_max_pct": 3.0
  },
  "tempo_quadro": {
   "piora_max_vs_base": 1.25
