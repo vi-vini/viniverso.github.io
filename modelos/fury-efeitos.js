@@ -1,5 +1,5 @@
 // Efeitos do The Fury no visualizador da loja: luz de cena escura, fogo e fumaça saindo do capacete,
-// brasa no colar e reflexo alaranjado do fogo na armadura.
+// brilho no colar e reflexo alaranjado do fogo na armadura.
 // Uso: const fx = (await import("modelos/fury-efeitos.js")).default({THREE, scene, root, camera, renderer, key, leve});
 //      a cada quadro fx.tick(dt, t); ao trocar de modelo fx.dispose().
 // As medidas estão em metros, no espaço do GLB (chão em y = 0, frente para +Z).
@@ -7,7 +7,6 @@
 export const P = {
   capacete: { x: -0.083, z: -0.07, base: 4.62, topo: 5.62, raio: 0.165 },
   nucleo: { de: 4.6, ate: 5.6, raio: 0.14, raioBase: 0.075, forca: 2.6 },
-  colar: { y: 4.64, raioIn: 0.1, raioOut: 0.3, forca: 0.9 },
   bacia: { de: 4.62, ate: 4.98, raioBase: 0.16, raioTopo: 0.27, forca: 3.0 },
   halo: [[0, 4.8, 0.3, 1.3, 0.5, true], [0, 5.66, 0, 0.9, 0.35, false]],
   chama: { altura: 0.45, largura: 0.2, y: -0.2 },
@@ -107,7 +106,16 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
     bg: scene.background, env: scene.environmentIntensity, exp: renderer.toneMappingExposure,
     key: key ? [key.color.getHex(), key.intensity, key.position.clone()] : null,
   };
-  const grupo = new THREE.Group(); grupo.name = "fury-efeitos"; root.add(grupo);
+  // os efeitos vão presos ao capacete (quando o modelo vem separado em peças): acompanham a montagem e somem com ele em "Ver peças".
+  const pai = root.getObjectByName("capacete") || root;
+  const grupo = new THREE.Group(); grupo.name = "fury-efeitos"; pai.add(grupo);
+  // a peça pode ter transformação própria (a compressão do GLB quantiza as posições e guarda escala e deslocamento no nó):
+  // desfaz isso para que as medidas abaixo continuem no espaço do modelo
+  if (pai !== root) {
+    root.updateMatrixWorld(true);
+    const rel = new THREE.Matrix4().copy(pai.matrixWorld).invert().multiply(root.matrixWorld);
+    rel.decompose(grupo.position, grupo.quaternion, grupo.scale);
+  }
   const luzes = new THREE.Group(); scene.add(luzes);
   const mats = [];
 
@@ -145,10 +153,7 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   nucleo.material.transparent = false; nucleo.material.depthWrite = true; nucleo.material.side = THREE.DoubleSide;
   nucleo.position.set(C.x, (N.de + N.ate) / 2, C.z); grupo.add(nucleo);
 
-  // brasa no colar, em volta da base do capacete
-  const anel = new THREE.Mesh(new THREE.RingGeometry(P.colar.raioIn, P.colar.raioOut, 48, 1), sh(FS_BRASA, { forca: { value: P.colar.forca } }));
-  anel.material.transparent = false; anel.material.depthWrite = true; anel.material.side = THREE.DoubleSide;
-  anel.rotation.x = -Math.PI / 2; anel.position.set(C.x, P.colar.y, C.z); grupo.add(anel);
+  // (sem disco de brasa no colar: de cima ele aparecia como um anel opaco em volta do capacete; o brilho do colar vem da bacia e da luz fogo4)
 
   const B = P.bacia;
   const bacia = new THREE.Mesh(new THREE.CylinderGeometry(B.raioTopo, B.raioBase, B.ate - B.de, 48, 1, true), sh(FS_BACIA, { forca: { value: B.forca } }));
@@ -251,7 +256,7 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   }
 
   function dispose() {
-    root.remove(grupo); scene.remove(luzes);
+    if (grupo.parent) grupo.parent.remove(grupo); scene.remove(luzes);
     grupo.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
     if (!imersivo) scene.background = antes.bg; scene.environmentIntensity = antes.env; renderer.toneMappingExposure = antes.exp;
     if (key && antes.key) { key.color.setHex(antes.key[0]); key.intensity = antes.key[1]; key.position.copy(antes.key[2]); }

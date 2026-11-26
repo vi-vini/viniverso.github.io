@@ -342,7 +342,9 @@ const MODELS={
 "felipe-clara":{titulo:"Felipe e Clara Camarão",sub:"As Cartas · capa do TCC · PLA cor cobre",glb:"modelos/felipe-clara-pbr.glb.wasm",leve:"modelos/felipe-clara-pbr-1k.glb.wasm",
  luz:{mapa:"modelos/felipe-clara-pbr-luz.jpg",mapaLeve:"modelos/felipe-clara-pbr-1k-luz.jpg",curva:"modelos/felipe-clara-pbr-curva.jpg",curvaLeve:"modelos/felipe-clara-pbr-1k-curva.jpg",reflexo:"modelos/felipe-clara-pbr-reflexo.jpg",reflexoLeve:"modelos/felipe-clara-pbr-1k-reflexo.jpg",max:2.1882,rmax:0.1856,chao:"modelos/felipe-clara-pbr-chao.jpg",cx:-0.0864,cz:-0.0231,raio:4.2},
  material:"pla-cobre",rt:true,escalaImersa:1.9},
-"fury":{titulo:"The Fury",sub:"Personagem para jogos · PBR 4K · fogo e fumaça em tempo real",glb:"modelos/fury-pbr.glb.wasm",leve:"modelos/fury-pbr-1k.glb.wasm",efeitos:"modelos/fury-efeitos.js",escalaImersa:2.6},
+"fury":{titulo:"The Fury",sub:"Personagem para jogos · PBR 4K · fogo e fumaça em tempo real",zoom:.86,glb:"modelos/fury-pbr.glb.wasm",leve:"modelos/fury-pbr-1k.glb.wasm",efeitos:"modelos/fury-efeitos.js",escalaImersa:3.4,distImersa:1.7,
+ montagem:{grupos:true,passo:.55,dur:1.1,alcance:.36,altura:.24,incremento:.02,ordem:["pernas","tanga","capa","cinto","peitoral","braco-direito","braco-esquerdo","machados","bracos-demonio","capacete"],
+  nomes:{"pernas":"pernas e cascos","tanga":"tanga","capa":"capa e cauda","cinto":"cinto e abdômen","peitoral":"peitoral e ombreiras","braco-direito":"braço direito","braco-esquerdo":"braço esquerdo","machados":"machados","bracos-demonio":"braços demoníacos","capacete":"capacete em chamas"}}},
 "cubo-teste":{titulo:"Cubo de teste",sub:"Duplo virtual de demonstração",glb:"modelos/cubo-teste.glb.wasm"}
 };
 const SITE_URL="https://vi-vini.github.io/viniverso.github.io/";
@@ -511,9 +513,15 @@ const usaRT=()=>rtCfg&&rtOn&&!wire&&RT&&RT.ready;
 // montagem animada das peças de impressão: cada peça entra voando, girando em torno do próprio centro, na ordem de encaixe
 let mont=null;const btnMont=$("#vmontar");
 const eo=x=>1-Math.pow(1-x,3),eoBack=x=>{const c=1.3;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
-function montPrepara(root,M){root.updateMatrixWorld(true);const pcs=[];root.traverse(o=>{if(o.isMesh&&!o.userData.decal)pcs.push(o)});
- const ord=M.ordem||[];pcs.sort((a,b)=>ord.indexOf(a.name)-ord.indexOf(b.name));
- const tot=new THREE.Box3(),it=pcs.map(o=>{o.geometry.computeBoundingBox();const b=o.geometry.boundingBox.clone().applyMatrix4(o.matrix);tot.union(b);return{o,b}});
+// caixa de uma peça no espaço do pai (malha solta ou grupo com várias malhas, como as peças do Fury)
+function caixaPeca(o){if(o.geometry){o.geometry.computeBoundingBox();return o.geometry.boundingBox.clone().applyMatrix4(o.matrix)}
+ const b=new THREE.Box3();o.updateMatrixWorld(true);const inv=o.parent.matrixWorld.clone().invert();
+ o.traverse(m=>{if(m.isMesh&&m.geometry){m.geometry.computeBoundingBox();b.union(m.geometry.boundingBox.clone().applyMatrix4(m.matrixWorld).applyMatrix4(inv))}});return b}
+const luzU=o=>o.material&&o.material.userData&&o.material.userData.luzU;
+function montPrepara(root,M){root.updateMatrixWorld(true);const pcs=[];const ord=M.ordem||[];
+ if(M.grupos){ord.forEach(n=>{const o=root.getObjectByName(n);if(o)pcs.push(o)})}else root.traverse(o=>{if(o.isMesh&&!o.userData.decal)pcs.push(o)});
+ pcs.sort((a,b)=>ord.indexOf(a.name)-ord.indexOf(b.name));
+ const tot=new THREE.Box3(),it=pcs.map(o=>{const b=caixaPeca(o);tot.union(b);return{o,b}});
  const cg=tot.getCenter(new THREE.Vector3()),S=tot.getSize(new THREE.Vector3()),L=Math.max(S.x,S.y,S.z),passo=M.passo||.55,dur=M.dur||1.1;
  const ps=it.map(({o,b},i)=>{const c=b.getCenter(new THREE.Vector3()),d=new THREE.Vector3(c.x-cg.x,0,c.z-cg.z);if(d.lengthSq()<1e-8)d.set(Math.sin(i*2.4),0,Math.cos(i*2.4));d.normalize();
   const off=i===0?new THREE.Vector3(0,L*.16,0):d.clone().multiplyScalar(L*(M.alcance??.42)).add(new THREE.Vector3(0,L*((M.altura??.3)+(M.incremento??.04)*i),0));
@@ -526,16 +534,16 @@ function montPose(m){let feito=0,atual=null;
   const f=.85+.15*eo(x);p.o.visible=!m.ativo||m.t>=p.t0;
   _q.setFromAxisAngle(p.ax,p.ang*(1-eo(x)));p.o.quaternion.copy(_q).multiply(p.q0);p.o.scale.copy(p.s0).multiplyScalar(f);
   _v.copy(p.p0).sub(p.c).applyQuaternion(_q).multiplyScalar(f).add(p.c);p.o.position.copy(_v).addScaledVector(p.off,1-eoBack(x));
-  const U=p.o.material.userData.luzU;if(U)U.luzMix.value=m.ativo?Math.min(1,Math.max(0,(x-.82)/.18)):1}
+  const U=luzU(p.o);if(U)U.luzMix.value=m.ativo?Math.min(1,Math.max(0,(x-.82)/.18)):1}
  if(decal)decal.material.opacity=Math.min(1,feito/m.pcs.length);m.feito=feito;m.atual=atual}
 function montInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false}mont.t=0;mont.ativo=true;montPose(mont);info();request()}
 function montFim(){if(!mont)return;mont.t=mont.fim;mont.ativo=false;montPose(mont);info()}
 let vp=null;const btnPecas=$("#vpecas"),_c=new THREE.Vector3();
-function vpMostra(i){mont.pcs.forEach((p,k)=>{p.o.visible=k===i;const U=p.o.material.userData.luzU;if(U)U.luzMix.value=k===i?0:1});
- const o=mont.pcs[i].o;o.updateWorldMatrix(true,false);o.geometry.computeBoundingSphere();const sp=o.geometry.boundingSphere.clone().applyMatrix4(o.matrixWorld);vp.c.copy(sp.center);vp.r=sp.radius;vp.i=i;info()}
+function vpMostra(i){mont.pcs.forEach((p,k)=>{p.o.visible=k===i;const U=luzU(p.o);if(U)U.luzMix.value=k===i?0:1});
+ const o=mont.pcs[i].o;o.updateWorldMatrix(true,true);let sp;if(o.geometry){o.geometry.computeBoundingSphere();sp=o.geometry.boundingSphere.clone().applyMatrix4(o.matrixWorld)}else sp=new THREE.Box3().setFromObject(o).getBoundingSphere(new THREE.Sphere());vp.c.copy(sp.center);vp.r=sp.radius;vp.i=i;info()}
 function vpCam(){const a=vp.a0+2*Math.PI*((vp.t%vp.dur)/vp.dur),e=.3,v=THREE.MathUtils.degToRad(camera.fov),hf=2*Math.atan(Math.tan(v/2)*camera.aspect),d=vp.r/Math.sin(Math.min(v,hf)/2)*1.02;
  camera.position.set(vp.c.x+Math.sin(a)*Math.cos(e)*d,vp.c.y+Math.sin(e)*d,vp.c.z+Math.cos(a)*Math.cos(e)*d);camera.lookAt(vp.c);controls.target.copy(vp.c)}
-function vpSai(){if(!vp)return;vp=null;controls.enabled=true;btnPecas.textContent="Ver peças";if(decal)decal.visible=true;if(mont)mont.pcs.forEach(p=>{p.o.visible=true;const U=p.o.material.userData.luzU;if(U)U.luzMix.value=1});frameCam()}
+function vpSai(){if(!vp)return;vp=null;controls.enabled=true;btnPecas.textContent="Ver peças";if(decal)decal.visible=true;if(mont)mont.pcs.forEach(p=>{p.o.visible=true;const U=luzU(p.o);if(U)U.luzMix.value=1});frameCam()}
 function pecasInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false}montFim();
  vp={t:0,i:-1,n:mont.pcs.length,dur:4,a0:-.7,c:new THREE.Vector3(),r:1};controls.enabled=false;btnPecas.textContent="Pular";if(decal)decal.visible=false;vpMostra(0);vpCam();request()}
 const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
@@ -691,9 +699,9 @@ async function show(cfg){
  root.position.sub(c);
  if(cfg.material)vestir(THREE,root,cfg.material);
  if(lz)root.traverse(o=>{if(o.isMesh&&o.material.aoMap)comLuz(THREE,o.material,lz,cfg.luz,1.6)});
- const H=cfg.escalaImersa||2.4,k=H/Math.max(sz.x,sz.y,sz.z),wid=Math.max(sz.x,sz.z)*k,dist=Math.max(3,H*1.35,wid*2),plH=.08;
+ const H=cfg.escalaImersa||2.4,k=H/Math.max(sz.x,sz.y,sz.z),wid=Math.max(sz.x,sz.z)*k,dist=cfg.distImersa||Math.max(3,H*1.35,wid*2),plH=.08;
  const h=new THREE.Group();h.add(root);h.scale.setScalar(k);h.position.set(0,plH+sz.y*k/2,-dist);holder=h;scene.add(h);
- const foot=Math.max(sz.x,sz.z)*k;plinth.scale.set(foot*1.3+.2,1,foot*1.3+.2);plinth.position.set(0,.04,-dist);
+ const foot=Math.max(sz.x,sz.z)*k;const pr=Math.min(foot*1.3+.2,dist*1.5);plinth.scale.set(pr,1,pr);plinth.position.set(0,.04,-dist);
  shadow.scale.setScalar(foot*3);shadow.position.set(0,.003,-dist);
  if(cfg.efeitos){try{const md=await import(new URL(cfg.efeitos,location.href).href);if(meu!==iseq)return;ifx=md.default({THREE,scene,root,camera,renderer,key:null,leve:weak||IOS,imersivo:true})}catch(e){console.warn("efeitos:",e)}}
  size();request()}
