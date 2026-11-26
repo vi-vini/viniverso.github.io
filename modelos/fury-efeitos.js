@@ -1,5 +1,5 @@
 // Efeitos do The Fury no visualizador da loja: luz de cena escura, fogo e fumaça saindo do capacete,
-// brasa no colar e reflexo alaranjado do fogo na armadura.
+// brilho no colar e reflexo alaranjado do fogo na armadura.
 // Uso: const fx = (await import("modelos/fury-efeitos.js")).default({THREE, scene, root, camera, renderer, key, leve});
 //      a cada quadro fx.tick(dt, t); ao trocar de modelo fx.dispose().
 // As medidas estão em metros, no espaço do GLB (chão em y = 0, frente para +Z).
@@ -7,7 +7,6 @@
 export const P = {
   capacete: { x: -0.083, z: -0.07, base: 4.62, topo: 5.62, raio: 0.165 },
   nucleo: { de: 4.6, ate: 5.6, raio: 0.14, raioBase: 0.075, forca: 2.6 },
-  colar: { y: 4.64, raioIn: 0.1, raioOut: 0.3, forca: 0.9 },
   bacia: { de: 4.62, ate: 4.98, raioBase: 0.16, raioTopo: 0.27, forca: 3.0 },
   halo: [[0, 4.8, 0.3, 1.3, 0.5, true], [0, 5.66, 0, 0.9, 0.35, false]],
   chama: { altura: 0.45, largura: 0.2, y: -0.2 },
@@ -107,7 +106,18 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
     bg: scene.background, env: scene.environmentIntensity, exp: renderer.toneMappingExposure,
     key: key ? [key.color.getHex(), key.intensity, key.position.clone()] : null,
   };
-  const grupo = new THREE.Group(); grupo.name = "fury-efeitos"; root.add(grupo);
+  // os efeitos vão presos à cabeça do rig ou ao capacete (quando o modelo vem em peças).
+  // com rig, vão no osso da cabeça (acompanham a respiração); sem rig, no capacete
+  const cap = root.getObjectByName("capacete");
+  const pai = root.getObjectByName("cabeca") || cap || root;
+  const grupo = new THREE.Group(); grupo.name = "fury-efeitos"; pai.add(grupo);
+  // a peça pode ter transformação própria (a compressão do GLB quantiza as posições e guarda escala e deslocamento no nó):
+  // desfaz isso para que as medidas abaixo continuem no espaço do modelo
+  if (pai !== root) {
+    root.updateMatrixWorld(true);
+    const rel = new THREE.Matrix4().copy(pai.matrixWorld).invert().multiply(root.matrixWorld);
+    rel.decompose(grupo.position, grupo.quaternion, grupo.scale);
+  }
   const luzes = new THREE.Group(); scene.add(luzes);
   const mats = [];
 
@@ -145,10 +155,7 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   nucleo.material.transparent = false; nucleo.material.depthWrite = true; nucleo.material.side = THREE.DoubleSide;
   nucleo.position.set(C.x, (N.de + N.ate) / 2, C.z); grupo.add(nucleo);
 
-  // brasa no colar, em volta da base do capacete
-  const anel = new THREE.Mesh(new THREE.RingGeometry(P.colar.raioIn, P.colar.raioOut, 48, 1), sh(FS_BRASA, { forca: { value: P.colar.forca } }));
-  anel.material.transparent = false; anel.material.depthWrite = true; anel.material.side = THREE.DoubleSide;
-  anel.rotation.x = -Math.PI / 2; anel.position.set(C.x, P.colar.y, C.z); grupo.add(anel);
+  // (sem disco de brasa no colar: de cima ele aparecia como um anel opaco em volta do capacete; o brilho do colar vem da bacia e da luz fogo4)
 
   const B = P.bacia;
   const bacia = new THREE.Mesh(new THREE.CylinderGeometry(B.raioTopo, B.raioBase, B.ate - B.de, 48, 1, true), sh(FS_BACIA, { forca: { value: B.forca } }));
@@ -240,18 +247,33 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   root.traverse((o) => {
     if (o.isMesh && o.material && o.material.name === "pelo") {
       o.material.alphaToCoverage = !!renderer.getContext().getContextAttributes().antialias;
+      // de longe o mipmap espalha o alfa e os fios viram uma chapa: compensa o alfa pelo nível de mip,
+      // para o recorte continuar fino em qualquer distância
+      if (!o.material.userData.mipAlfa) {
+        o.material.userData.mipAlfa = true;
+        o.material.onBeforeCompile = (sh) => {
+          sh.fragmentShader = sh.fragmentShader.replace("#include <alphatest_fragment>", `
+#ifdef USE_MAP
+  { vec2 tm = vec2(textureSize(map, 0)); vec2 dd = max(abs(dFdx(vMapUv * tm)), abs(dFdy(vMapUv * tm)));
+    float lod = max(0., log2(max(max(dd.x, dd.y), 1e-4))); diffuseColor.a *= 1. + lod * .25; }
+#endif
+#include <alphatest_fragment>`);
+        };
+        o.material.customProgramCacheKey = () => "pelo-mip-alfa";
+      }
       o.material.needsUpdate = true;
     }
   });
 
     function tick(dt, t) {
     for (const m of mats) m.uniforms.t.value = t;
+    if (cap && pai !== cap) grupo.visible = cap.visible;   // some junto com o capacete em "Ver peças"
     const f = 0.82 + 0.18 * Math.sin(t * 11.0) * Math.sin(t * 7.3 + 1.0) + 0.08 * Math.sin(t * 23.0);
     fogo.intensity = L.fogo[1] * f; fogo4.intensity = L.colar[1] * (0.8 + 0.2 * f); fogo2.intensity = L.chamaLuz[1] * (0.7 + 0.3 * f);
   }
 
   function dispose() {
-    root.remove(grupo); scene.remove(luzes);
+    if (grupo.parent) grupo.parent.remove(grupo); scene.remove(luzes);
     grupo.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
     if (!imersivo) scene.background = antes.bg; scene.environmentIntensity = antes.env; renderer.toneMappingExposure = antes.exp;
     if (key && antes.key) { key.color.setHex(antes.key[0]); key.intensity = antes.key[1]; key.position.copy(antes.key[2]); }
