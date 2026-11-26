@@ -1,0 +1,129 @@
+# Bancada da versão de teste do jogo (lab/).
+# Em cada PR que mexe em lab/, bench/ ou tools/: mede o lab/ do PR e o lab/ da branch base em paralelo
+# (máquinas do mesmo tipo), compara com o orçamento e com as imagens de referência, comenta o resumo no PR
+# e guarda as imagens como artefato.
+name: Bancada do laboratório
+
+on:
+  pull_request:
+    paths: ["lab/**", "bench/**", "tools/**", ".github/workflows/bancada-lab.yml"]
+  workflow_dispatch:
+    inputs:
+      rapido:
+        description: "Só 2 sondas (mais rápido)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: bancada-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  medir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        lado: [cabeca, base]
+    steps:
+      - uses: actions/checkout@v4
+        if: matrix.lado == 'cabeca' || github.event_name == 'pull_request'
+
+      - uses: actions/setup-node@v4
+        if: matrix.lado == 'cabeca' || github.event_name == 'pull_request'
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: bench/package-lock.json
+
+      - name: Dependências da bancada
+        if: matrix.lado == 'cabeca' || github.event_name == 'pull_request'
+        working-directory: bench
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: lab/ da branch base
+        if: matrix.lado == 'base' && github.event_name == 'pull_request'
+        run: |
+          git fetch --depth=1 origin "${{ github.base_ref }}"
+          mkdir -p /tmp/base
+          git archive FETCH_HEAD lab | tar -x -C /tmp/base
+          rm -rf lab && mv /tmp/base/lab ./lab
+
+      - name: Medir
+        if: matrix.lado == 'cabeca' || github.event_name == 'pull_request'
+        run: node bench/run.mjs --alvo lab --saida bench/resultados/${{ matrix.lado }} ${{ inputs.rapido && '--rapido' || '' }}
+
+      - uses: actions/upload-artifact@v4
+        if: always() && (matrix.lado == 'cabeca' || github.event_name == 'pull_request')
+        with:
+          name: medicao-${{ matrix.lado }}
+          path: bench/resultados
+          retention-days: 14
+
+  comparar:
+    needs: medir
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: bench
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: bench/package-lock.json
+
+      - name: Dependências (sem navegador)
+        working-directory: bench
+        run: PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm ci
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: medicao-*
+          path: bench/resultados
+          merge-multiple: true
+
+      - name: Comparar com orçamento e referências
+        id: comparar
+        continue-on-error: true
+        run: |
+          B=""
+          if [ -f bench/resultados/base/metricas.json ]; then B="--base resultados/base"; fi
+          node bench/compara.mjs --cabeca resultados/cabeca $B
+
+      - name: Resumo
+        if: always()
+        run: cat bench/resultados/resumo.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo "A medição não gerou resumo; veja os logs do job medir." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comentar no PR
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          f=bench/resultados/resumo.md
+          if [ -f "$f" ]; then cp "$f" /tmp/comentario.md; else echo "A bancada não terminou. Veja os logs." > /tmp/comentario.md; fi
+          echo -e "\nImagens, diferenças (.dif.png) e métricas: artefato **bancada** em ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> /tmp/comentario.md
+          gh pr comment "${{ github.event.pull_request.number }}" -R "${{ github.repository }}" --body-file /tmp/comentario.md --edit-last \
+            || gh pr comment "${{ github.event.pull_request.number }}" -R "${{ github.repository }}" --body-file /tmp/comentario.md
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bancada
+          path: bench/resultados
+          retention-days: 14
+
+      - name: Falhar se fora do orçamento
+        if: needs.medir.result != 'success' || steps.comparar.outcome != 'success'
+        run: |
+          echo "A medição falhou ou o PR saiu do orçamento. Veja o resumo."
+          exit 1

@@ -1,0 +1,25 @@
+{
+ "_leia": "Limites que o laboratório não pode ultrapassar. Valores iniciais = linha de base de 26/11/2026 + ~10% de folga. Arquivo protegido: só o humano altera. Metas de melhoria ficam em lab/TAREFAS.md, não aqui.",
+ "perfis": {
+  "celular": {
+   "triangulos_max": 3400000,
+   "draw_calls_max": 135,
+   "download_mb_max": 63,
+   "heap_mb_max": 160
+  },
+  "desktop": {
+   "triangulos_max": 26000000,
+   "draw_calls_max": 335,
+   "download_mb_max": 620,
+   "heap_mb_max": 400
+  }
+ },
+ "imagem": {
+  "limiar_pixel": 0.1,
+  "dif_aviso_pct": 0.5,
+  "dif_max_pct": 2.0
+ },
+ "tempo_quadro": {
+  "piora_max_vs_base": 1.25
+ }
+}

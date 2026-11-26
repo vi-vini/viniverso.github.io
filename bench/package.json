@@ -1,0 +1,16 @@
+{
+  "name": "viniverso-bancada",
+  "private": true,
+  "type": "module",
+  "description": "Bancada de desempenho e imagem da versão de teste (lab/) do jogo Quatro Momentos",
+  "scripts": {
+    "bench": "node run.mjs",
+    "compara": "node compara.mjs"
+  },
+  "dependencies": {
+    "pixelmatch": "5.3.0",
+    "playwright": "1.63.0",
+    "pngjs": "7.0.0",
+    "three": "0.170.0"
+  }
+}

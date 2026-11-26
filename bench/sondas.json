@@ -1,0 +1,67 @@
+{
+ "_leia": "Pontos fixos da câmera usados pela bancada. cena e rota começam em 0; u é a fração do percurso (0 a 1). janela_ms e quadros_min: a medição dura pelo menos esse tempo e esse número de quadros. Arquivo protegido: não altere sem aprovação humana, pois as imagens de referência em bench/ref dependem destes pontos.",
+ "janela_ms": 4000,
+ "perfis": {
+  "celular": {
+   "largura": 390,
+   "altura": 844,
+   "qualidade": "leve",
+   "nucleos": 4,
+   "memoria": 4,
+   "toque": true,
+   "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1"
+  },
+  "desktop": {
+   "largura": 960,
+   "altura": 540,
+   "qualidade": "alta",
+   "nucleos": 8,
+   "memoria": 8
+  }
+ },
+ "sondas": [
+  {
+   "nome": "c1-introducao",
+   "cena": 0,
+   "rota": 0,
+   "u": 0.5
+  },
+  {
+   "nome": "c1-mascagem",
+   "cena": 0,
+   "rota": 2,
+   "u": 0.5
+  },
+  {
+   "nome": "c1-servico-oca",
+   "cena": 0,
+   "rota": 4,
+   "u": 0.8
+  },
+  {
+   "nome": "c1-cauinagem",
+   "cena": 0,
+   "rota": 5,
+   "u": 0.5
+  },
+  {
+   "nome": "c2-bote",
+   "cena": 1,
+   "rota": 2,
+   "u": 0.5
+  },
+  {
+   "nome": "c3-tercos-lusos",
+   "cena": 2,
+   "rota": 3,
+   "u": 0.7
+  },
+  {
+   "nome": "c4-fim",
+   "cena": 3,
+   "rota": 3,
+   "u": 0.5
+  }
+ ],
+ "quadros_min": 6
+}
