@@ -106,8 +106,10 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
     bg: scene.background, env: scene.environmentIntensity, exp: renderer.toneMappingExposure,
     key: key ? [key.color.getHex(), key.intensity, key.position.clone()] : null,
   };
-  // os efeitos vão presos ao capacete (quando o modelo vem separado em peças): acompanham a montagem e somem com ele em "Ver peças".
-  const pai = root.getObjectByName("capacete") || root;
+  // os efeitos vão presos à cabeça do rig ou ao capacete (quando o modelo vem em peças).
+  // com rig, vão no osso da cabeça (acompanham a respiração); sem rig, no capacete
+  const cap = root.getObjectByName("capacete");
+  const pai = root.getObjectByName("cabeca") || cap || root;
   const grupo = new THREE.Group(); grupo.name = "fury-efeitos"; pai.add(grupo);
   // a peça pode ter transformação própria (a compressão do GLB quantiza as posições e guarda escala e deslocamento no nó):
   // desfaz isso para que as medidas abaixo continuem no espaço do modelo
@@ -251,6 +253,7 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
 
     function tick(dt, t) {
     for (const m of mats) m.uniforms.t.value = t;
+    if (cap && pai !== cap) grupo.visible = cap.visible;   // some junto com o capacete em "Ver peças"
     const f = 0.82 + 0.18 * Math.sin(t * 11.0) * Math.sin(t * 7.3 + 1.0) + 0.08 * Math.sin(t * 23.0);
     fogo.intensity = L.fogo[1] * f; fogo4.intensity = L.colar[1] * (0.8 + 0.2 * f); fogo2.intensity = L.chamaLuz[1] * (0.7 + 0.3 * f);
   }
