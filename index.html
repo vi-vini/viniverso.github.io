@@ -290,7 +290,7 @@ const WA="5584998204677";
 /* m: nome do modelo 3D no visualizador (veja MODELS). Por enquanto todos apontam para o cubo de teste. */
 /* video (opcional): vídeo do giro, sem áudio, que toca ao abrir a galeria. fotos (opcional): lista de {src,rotulo} com a galeria do item, ex.: fotos:[{src:"img/leviathan-frente.jpg",rotulo:"Frente"},{src:"img/leviathan-lateral.jpg",rotulo:"Lateral"},{src:"img/leviathan-costas.jpg",rotulo:"Costas"}]. Sem fotos, a galeria mostra só a imagem do item. */
 const PRODUCTS=[
-{id:"fury-3d",t:"The Fury, personagem AAA para jogos",k:"Modelos 3D",m:"fury",fotos:[{src:"img/fury.jpg",rotulo:"Render no Unreal"},{src:"img/fury-frente.jpg",rotulo:"Frente · visualizador"},{src:"img/fury-lateral.jpg",rotulo:"Lateral · visualizador"},{src:"img/fury-costas.jpg",rotulo:"Costas · visualizador"}],p:300,img:"img/fury.jpg",d:"Personagem de jogo otimizado: cerca de 157 mil triângulos com pelos em cards, 8 conjuntos de texturas PBR 4K pintados no Substance Painter e testado no Unreal Engine 5. Arquivo digital."},
+{id:"fury-3d",t:"The Fury, personagem AAA para jogos",k:"Modelos 3D",m:"fury",fotos:[{src:"img/fury.jpg",rotulo:"Render no Unreal"},{src:"img/fury-frente.jpg",rotulo:"Frente · visualizador"},{src:"img/fury-lateral.jpg",rotulo:"Lateral · visualizador"},{src:"img/fury-costas.jpg",rotulo:"Costas · visualizador"},{src:"img/fury-capacete.jpg",rotulo:"Capacete · fogo em tempo real"}],p:300,img:"img/fury.jpg",d:"Personagem de jogo otimizado, finalizado no Unreal Engine 5: armadura com braços diabólicos e pelos em cards, 8 conjuntos de texturas PBR 4K pintados no Substance Painter. No visualizador, fogo e fumaça saem do capacete em tempo real. Arquivo digital."},
 {id:"clara-print",t:"Clara Camarão, escultura impressa",k:"Esculturas impressas",m:"clara-camarao",fotos:[{src:"img/clara-camarao.webp",rotulo:"Impressa"},{src:"img/clara-camarao-frente.jpg",rotulo:"Frente · modelo digital"},{src:"img/clara-camarao-lateral.jpg",rotulo:"Lateral · modelo digital"},{src:"img/clara-camarao-costas.jpg",rotulo:"Costas · modelo digital"}],p:null,img:"img/clara-camarao.webp",d:"Escultura de Clara Camarão impressa em PLA vermelho acetinado. Sob encomenda."},
 {id:"felipe-clara",t:"Felipe e Clara Camarão, escultura impressa",k:"Esculturas impressas",m:"felipe-clara",fotos:[{src:"img/felipe-clara.jpg",rotulo:"Frente"},{src:"img/felipe-clara-lateral.jpg",rotulo:"Lateral"},{src:"img/felipe-clara-costas.jpg",rotulo:"Costas"}],p:null,img:"img/felipe-clara.jpg",d:"As Cartas, capa do TCC Quatro momentos da vida de Felipe Camarão. PLA cor cobre, impressa sob encomenda."},
 {id:"leviathan",t:"Leviathan, modelo 3D",k:"Modelos 3D",m:"leviathan",video:"video/leviathan-giro.mp4",fotos:[{src:"img/leviathan-frente.jpg",rotulo:"Frente"},{src:"img/leviathan-lateral.jpg",rotulo:"Lateral"},{src:"img/leviathan-costas.jpg",rotulo:"Costas"}],p:300,img:"img/leviathan.jpg",d:"Modelo feito no Maya. Arquivo digital."},
@@ -342,7 +342,7 @@ const MODELS={
 "felipe-clara":{titulo:"Felipe e Clara Camarão",sub:"As Cartas · capa do TCC · PLA cor cobre",glb:"modelos/felipe-clara-pbr.glb.wasm",leve:"modelos/felipe-clara-pbr-1k.glb.wasm",
  luz:{mapa:"modelos/felipe-clara-pbr-luz.jpg",mapaLeve:"modelos/felipe-clara-pbr-1k-luz.jpg",curva:"modelos/felipe-clara-pbr-curva.jpg",curvaLeve:"modelos/felipe-clara-pbr-1k-curva.jpg",reflexo:"modelos/felipe-clara-pbr-reflexo.jpg",reflexoLeve:"modelos/felipe-clara-pbr-1k-reflexo.jpg",max:2.1882,rmax:0.1856,chao:"modelos/felipe-clara-pbr-chao.jpg",cx:-0.0864,cz:-0.0231,raio:4.2},
  material:"pla-cobre",rt:true,escalaImersa:1.9},
-"fury":{titulo:"The Fury",sub:"Personagem para jogos · PBR 4K · 157 mil triângulos",glb:"modelos/fury-pbr.glb.wasm",leve:"modelos/fury-pbr-1k.glb.wasm",ambiente:.38,luzChave:.7,exposicao:1,escalaImersa:2.6},
+"fury":{titulo:"The Fury",sub:"Personagem para jogos · PBR 4K · fogo e fumaça em tempo real",glb:"modelos/fury-pbr.glb.wasm",leve:"modelos/fury-pbr-1k.glb.wasm",efeitos:"modelos/fury-efeitos.js",escalaImersa:2.6},
 "cubo-teste":{titulo:"Cubo de teste",sub:"Duplo virtual de demonstração",glb:"modelos/cubo-teste.glb.wasm"}
 };
 const SITE_URL="https://vi-vini.github.io/viniverso.github.io/";
@@ -548,10 +548,11 @@ function request(){if(active&&!raf)raf=requestAnimationFrame(tick)}
 function tick(t){raf=0;if(!active)return;const dt=Math.min(.1,(t-lastT)/1000||.016);
 if(vp){vp.t+=dt;const i=Math.floor(vp.t/vp.dur);if(i>=vp.n){vpSai();montInicia()}else{if(i!==vp.i)vpMostra(i);vpCam()}}else controls.update(dt);let mais=false;
 if(mont&&mont.ativo){mont.t+=dt;if(mont.t>=mont.fim)montFim();else{montPose(mont);if(((t/250)|0)!==((lastT/250)|0))info()}}
+if(fx)fx.tick(dt,t/1000);
 if(usaRT()){RT.pt.renderSample();mais=RT.pt.samples<MAXS;if(((t/400)|0)!==((lastT/400)|0))info()}else renderer.render(scene,camera);
 // qualidade adaptativa: se o aparelho passar de ~30 ms por quadro, reduz a resolução
 if(lastT&&t-lastT<250&&!usaRT()){if(t-lastT>34){if(++slow>=24&&pr>1){pr=Math.max(1,pr-.5);renderer.setPixelRatio(pr);size();info();slow=0}}else slow=Math.max(0,slow-1)}
-lastT=t;if(controls.autoRotate||mais||(mont&&mont.ativo)||vp)request()}
+lastT=t;if(controls.autoRotate||mais||(mont&&mont.ativo)||vp||fx)request()}
 controls.addEventListener("change",()=>{if(usaRT())RT.pt.updateCamera();request()});
 new ResizeObserver(size).observe(host);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)request()});
@@ -563,8 +564,8 @@ btnRT.onclick=()=>{rtOn=!rtOn;btnRT.setAttribute("aria-pressed",String(rtOn));if
 btnReset.onclick=()=>frameCam();
 btnMont.onclick=()=>{vpSai();montInicia()};
 btnPecas.onclick=()=>{if(vp){vpSai();montInicia()}else pecasInicia()};
-function clear(){if(!holder)return;scene.remove(holder);holder.traverse(o=>{if(o.isMesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{for(const k in m){if(m[k]&&m[k].isTexture)m[k].dispose()}m.dispose()})}});holder=null;mats=[]}
-let seq=0;
+function clear(){if(fx){fx.dispose();fx=null}if(!holder)return;scene.remove(holder);holder.traverse(o=>{if(o.isMesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{for(const k in m){if(m[k]&&m[k].isTexture)m[k].dispose()}m.dispose()})}});holder=null;mats=[]}
+let seq=0,fx=null;   // fx: efeitos animados do modelo (fogo, fumaça, luz própria), carregados de cfg.efeitos
 async function show(cfg){const meu=++seq;
 clear();mont=null;if(vp){vp=null;controls.enabled=true;btnPecas.textContent="Ver peças"}
 const leve=weak&&!!cfg.leve;if(RT)RT.ready=false;
@@ -587,6 +588,7 @@ radius=.5*Math.hypot(sz.x,sz.y,sz.z)*k;tgt.set(0,sz.y*k/2,0);dims.set(Math.max(s
 rtCfg=!!cfg.rt;btnRT.hidden=!rtCfg;host.classList.toggle("vrt-on",rtCfg);
 if(rtCfg||luzCfg)estudioLiga();
 else{scene.environment=roomEnv;scene.environmentIntensity=cfg.ambiente??.7;scene.background=null;renderer.toneMappingExposure=cfg.exposicao??1;key.intensity=cfg.luzChave??.9;key.visible=true;shadow.visible=true;if(EST)EST.floor.visible=false}
+if(cfg.efeitos){try{const md=await import(new URL(cfg.efeitos,location.href).href);if(meu!==seq)return;fx=md.default({THREE,scene,root,camera,renderer,key,leve:weak||IOS})}catch(e){console.warn("efeitos:",e)}}
 mont=cfg.montagem?montPrepara(root,cfg.montagem):null;btnMont.hidden=btnPecas.hidden=!mont;
 size();frameCam();
 if(mont){if(calm)montFim();else montInicia()}
@@ -663,9 +665,9 @@ const up=e=>{if(e.pointerId===pid)pid=null};canvas.addEventListener("pointerup",
 function request(){if(iActive&&!raf)raf=requestAnimationFrame(tick)}
 function tick(t){raf=0;if(!iActive)return;const dt=Math.min(.1,(t-lastT)/1000||.016);
  if(spin&&holder)holder.rotation.y+=dt*.35;
- applyCam();renderer.render(scene,camera);
+ applyCam();if(ifx)ifx.tick(dt,t/1000);renderer.render(scene,camera);
  if(lastT&&t-lastT<250){if(t-lastT>34){if(++slow>=24&&pr>1){pr=Math.max(1,pr-.5);renderer.setPixelRatio(pr);size();slow=0}}else slow=Math.max(0,slow-1)}
- lastT=t;if(gyro||spin)request()}
+ lastT=t;if(gyro||spin||ifx)request()}
 function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.fov=camera.aspect<1?78:68;camera.updateProjectionMatrix();request()}
 new ResizeObserver(size).observe(host);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){request();if(iActive&&gyro&&navigator.wakeLock)navigator.wakeLock.request("screen").then(w=>{wake=w}).catch(()=>{})}});
@@ -680,8 +682,8 @@ function begin(){ // chamado por um toque do usuário
 $("#igyro").onclick=async()=>{begin();$("#ipanel").hidden=true;await gyroOn();request()};
 $("#itouch").onclick=()=>{begin();$("#ipanel").hidden=true;setMode("Modo toque: arraste o dedo para olhar ao redor.");request()};
 const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-function clear(){if(!holder)return;scene.remove(holder);holder.traverse(o=>{if(o.isMesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{for(const k in m){if(m[k]&&m[k].isTexture)m[k].dispose()}m.dispose()})}});holder=null}
-let iseq=0;
+function clear(){if(ifx){ifx.dispose();ifx=null}if(!holder)return;scene.remove(holder);holder.traverse(o=>{if(o.isMesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{for(const k in m){if(m[k]&&m[k].isTexture)m[k].dispose()}m.dispose()})}});holder=null}
+let iseq=0,ifx=null;
 async function show(cfg){
  const meu=++iseq;clear();const leve=weak&&!!cfg.leve;const [gltf,lz]=await Promise.all([loader.loadAsync(leve?cfg.leve:cfg.glb),cfg.luz?carregaLuz(THREE,cfg,leve):null]);
  if(meu!==iseq)return;clear();
@@ -693,6 +695,7 @@ async function show(cfg){
  const h=new THREE.Group();h.add(root);h.scale.setScalar(k);h.position.set(0,plH+sz.y*k/2,-dist);holder=h;scene.add(h);
  const foot=Math.max(sz.x,sz.z)*k;plinth.scale.set(foot*1.3+.2,1,foot*1.3+.2);plinth.position.set(0,.04,-dist);
  shadow.scale.setScalar(foot*3);shadow.position.set(0,.003,-dist);
+ if(cfg.efeitos){try{const md=await import(new URL(cfg.efeitos,location.href).href);if(meu!==iseq)return;ifx=md.default({THREE,scene,root,camera,renderer,key:null,leve:weak||IOS,imersivo:true})}catch(e){console.warn("efeitos:",e)}}
  size();request()}
 return{show,request,size,reset(){gyroOff();stopWake();dragYaw=0;dragPitch=0;spin=false;bRot.setAttribute("aria-pressed","false");setMode("")},hasGyro:()=>gyro}}
 window.imersivo={
