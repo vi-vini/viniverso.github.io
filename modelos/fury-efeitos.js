@@ -247,6 +247,20 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   root.traverse((o) => {
     if (o.isMesh && o.material && o.material.name === "pelo") {
       o.material.alphaToCoverage = !!renderer.getContext().getContextAttributes().antialias;
+      // de longe o mipmap espalha o alfa e os fios viram uma chapa: compensa o alfa pelo nível de mip,
+      // para o recorte continuar fino em qualquer distância
+      if (!o.material.userData.mipAlfa) {
+        o.material.userData.mipAlfa = true;
+        o.material.onBeforeCompile = (sh) => {
+          sh.fragmentShader = sh.fragmentShader.replace("#include <alphatest_fragment>", `
+#ifdef USE_MAP
+  { vec2 tm = vec2(textureSize(map, 0)); vec2 dd = max(abs(dFdx(vMapUv * tm)), abs(dFdy(vMapUv * tm)));
+    float lod = max(0., log2(max(max(dd.x, dd.y), 1e-4))); diffuseColor.a *= 1. + lod * .25; }
+#endif
+#include <alphatest_fragment>`);
+        };
+        o.material.customProgramCacheKey = () => "pelo-mip-alfa";
+      }
       o.material.needsUpdate = true;
     }
   });
