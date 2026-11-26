@@ -290,13 +290,13 @@ const WA="5584998204677";
 /* m: nome do modelo 3D no visualizador (veja MODELS). Por enquanto todos apontam para o cubo de teste. */
 /* video (opcional): vídeo do giro, sem áudio, que toca ao abrir a galeria. fotos (opcional): lista de {src,rotulo} com a galeria do item, ex.: fotos:[{src:"img/leviathan-frente.jpg",rotulo:"Frente"},{src:"img/leviathan-lateral.jpg",rotulo:"Lateral"},{src:"img/leviathan-costas.jpg",rotulo:"Costas"}]. Sem fotos, a galeria mostra só a imagem do item. */
 const PRODUCTS=[
+{id:"fury-3d",t:"The Fury, personagem AAA para jogos",k:"Modelos 3D",m:"fury",fotos:[{src:"img/fury.jpg",rotulo:"Render no Unreal"},{src:"img/fury-frente.jpg",rotulo:"Frente · visualizador"},{src:"img/fury-lateral.jpg",rotulo:"Lateral · visualizador"},{src:"img/fury-costas.jpg",rotulo:"Costas · visualizador"}],p:300,img:"img/fury.jpg",d:"Personagem de jogo otimizado: cerca de 157 mil triângulos com pelos em cards, 8 conjuntos de texturas PBR 4K pintados no Substance Painter e testado no Unreal Engine 5. Arquivo digital."},
 {id:"clara-print",t:"Clara Camarão, escultura impressa",k:"Esculturas impressas",m:"clara-camarao",fotos:[{src:"img/clara-camarao.webp",rotulo:"Impressa"},{src:"img/clara-camarao-frente.jpg",rotulo:"Frente · modelo digital"},{src:"img/clara-camarao-lateral.jpg",rotulo:"Lateral · modelo digital"},{src:"img/clara-camarao-costas.jpg",rotulo:"Costas · modelo digital"}],p:null,img:"img/clara-camarao.webp",d:"Escultura de Clara Camarão impressa em PLA vermelho acetinado. Sob encomenda."},
 {id:"felipe-clara",t:"Felipe e Clara Camarão, escultura impressa",k:"Esculturas impressas",m:"felipe-clara",fotos:[{src:"img/felipe-clara.jpg",rotulo:"Frente"},{src:"img/felipe-clara-lateral.jpg",rotulo:"Lateral"},{src:"img/felipe-clara-costas.jpg",rotulo:"Costas"}],p:null,img:"img/felipe-clara.jpg",d:"As Cartas, capa do TCC Quatro momentos da vida de Felipe Camarão. PLA cor cobre, impressa sob encomenda."},
 {id:"leviathan",t:"Leviathan, modelo 3D",k:"Modelos 3D",m:"leviathan",video:"video/leviathan-giro.mp4",fotos:[{src:"img/leviathan-frente.jpg",rotulo:"Frente"},{src:"img/leviathan-lateral.jpg",rotulo:"Lateral"},{src:"img/leviathan-costas.jpg",rotulo:"Costas"}],p:300,img:"img/leviathan.jpg",d:"Modelo feito no Maya. Arquivo digital."},
 {id:"felipe-print",t:"Felipe Camarão, escultura impressa",k:"Esculturas impressas",m:"felipe-camarao",fotos:[{src:"img/camaraoprint.jpg",rotulo:"Impressa"},{src:"img/felipe-camarao.jpg",rotulo:"Frente"},{src:"img/felipe-camarao-lateral.jpg",rotulo:"Lateral"},{src:"img/felipe-camarao-costas.jpg",rotulo:"Costas"}],p:180,img:"img/camaraoprint.jpg",d:"PLA, 25×10×10 cm. Impressa sob encomenda."},
 {id:"monumento",t:"Apropriação de um Monumento",k:"Esculturas impressas",m:"cubo-teste",p:260,img:"img/monumento.jpg",d:"PLA, 22×30×60 cm (a menor mede 11×15×30 cm). Tem QR code para o jogo."},
 {id:"malfeitinha",t:"Malfeitinha, figura para impressão",k:"Esculturas impressas",m:"cubo-teste",p:150,img:"img/malfeitinha.jpg",d:"Personagem modelada para impressão 3D."},
-{id:"fury-3d",t:"The Fury, modelo 3D",k:"Modelos 3D",m:"cubo-teste",p:300,img:"img/fury.jpg",d:"Personagem de jogo com malha low poly e mapas de textura. Arquivo digital."},
 {id:"ecorche",t:"Écorché, estudo anatômico",k:"Modelos 3D",m:"cubo-teste",p:200,img:"img/ecorche.jpg",d:"Músculos do corpo humano modelados em 3D. Arquivo digital."},
 {id:"camarao-hp",t:"Felipe Camarão, personagem de alta resolução",k:"Modelos 3D",m:"cubo-teste",p:null,img:"img/camarao3d.jpg",d:"Modelo de alta contagem de polígonos. Preço sob consulta."},
 {id:"lavoura",t:"Lavoura, gravura",k:"Obras originais",p:null,img:"img/lavoura.jpg",d:"Gravura em linóleo, nanquim, acrílica e giz sobre papel, 14,8×21 cm. Da série Pendendo dos Ossos."},
@@ -342,6 +342,7 @@ const MODELS={
 "felipe-clara":{titulo:"Felipe e Clara Camarão",sub:"As Cartas · capa do TCC · PLA cor cobre",glb:"modelos/felipe-clara-pbr.glb.wasm",leve:"modelos/felipe-clara-pbr-1k.glb.wasm",
  luz:{mapa:"modelos/felipe-clara-pbr-luz.jpg",mapaLeve:"modelos/felipe-clara-pbr-1k-luz.jpg",curva:"modelos/felipe-clara-pbr-curva.jpg",curvaLeve:"modelos/felipe-clara-pbr-1k-curva.jpg",reflexo:"modelos/felipe-clara-pbr-reflexo.jpg",reflexoLeve:"modelos/felipe-clara-pbr-1k-reflexo.jpg",max:2.1882,rmax:0.1856,chao:"modelos/felipe-clara-pbr-chao.jpg",cx:-0.0864,cz:-0.0231,raio:4.2},
  material:"pla-cobre",rt:true,escalaImersa:1.9},
+"fury":{titulo:"The Fury",sub:"Personagem para jogos · PBR 4K · 157 mil triângulos",glb:"modelos/fury-pbr.glb.wasm",leve:"modelos/fury-pbr-1k.glb.wasm",ambiente:.38,luzChave:.7,exposicao:1,escalaImersa:2.6},
 "cubo-teste":{titulo:"Cubo de teste",sub:"Duplo virtual de demonstração",glb:"modelos/cubo-teste.glb.wasm"}
 };
 const SITE_URL="https://vi-vini.github.io/viniverso.github.io/";
@@ -573,6 +574,7 @@ clear();
 const root=gltf.scene,box=new THREE.Box3().setFromObject(root),sz=box.getSize(new THREE.Vector3()),c=box.getCenter(new THREE.Vector3());
 root.position.sub(c);
 if(cfg.material)vestir(THREE,root,cfg.material);
+else if(IOS)root.traverse(o=>{if(o.isMesh&&o.material.metalnessMap)o.material.metalness=.35});   // no iPhone não há mapa de ambiente: metal puro ficaria preto
 luzCfg=!!lz;decal=null;
 if(lz){root.traverse(o=>{if(o.isMesh&&o.material.aoMap)comLuz(THREE,o.material,lz,cfg.luz)});decal=decalChao(THREE,lz.ch,cfg.luz);gltf.scene.add(decal)}
 if(cfg.rt)root.traverse(o=>{if(o.isMesh)o.geometry=floatGeo(THREE,o.geometry)});   // o traçador de raios precisa de posições em ponto flutuante (o meshopt quantiza)
@@ -584,7 +586,7 @@ shadow.scale.setScalar(Math.max(sz.x,sz.z)*k*2.6);
 radius=.5*Math.hypot(sz.x,sz.y,sz.z)*k;tgt.set(0,sz.y*k/2,0);dims.set(Math.max(sz.x,sz.z)*k*1.08,sz.y*k,Math.min(sz.x,sz.z)*k);zoomCfg=cfg.zoom||0;
 rtCfg=!!cfg.rt;btnRT.hidden=!rtCfg;host.classList.toggle("vrt-on",rtCfg);
 if(rtCfg||luzCfg)estudioLiga();
-else{scene.environment=roomEnv;scene.environmentIntensity=.7;scene.background=null;renderer.toneMappingExposure=1;key.visible=true;shadow.visible=true;if(EST)EST.floor.visible=false}
+else{scene.environment=roomEnv;scene.environmentIntensity=cfg.ambiente??.7;scene.background=null;renderer.toneMappingExposure=cfg.exposicao??1;key.intensity=cfg.luzChave??.9;key.visible=true;shadow.visible=true;if(EST)EST.floor.visible=false}
 mont=cfg.montagem?montPrepara(root,cfg.montagem):null;btnMont.hidden=btnPecas.hidden=!mont;
 size();frameCam();
 if(mont){if(calm)montFim();else montInicia()}
