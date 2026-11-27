@@ -330,7 +330,7 @@ const MODELS={
  montagem:{passo:.60,dur:1.15,alcance:.30,altura:.21,incremento:.018,
   ordem:["pe-clara","BOLA-PE","saia","pernbola-a","BOLA-TRONCO","tronco","BOLA-BRACO1","braco-direito","BOLA-BRACO","mao-esquerda"],
   nomes:{"pe-clara":"pé e base","BOLA-PE":"encaixe do pé","saia":"saia e pernas","pernbola-a":"encaixe da perna","BOLA-TRONCO":"encaixe do tronco","tronco":"tronco e cocar","BOLA-BRACO1":"encaixe do braço 1","braco-direito":"braço direito","BOLA-BRACO":"encaixe do braço 2","mao-esquerda":"braço esquerdo e arco"}}},
-"leviathan":{titulo:"Leviathan",sub:"8 peças de impressão · cores do render",zoom:.86,glb:"modelos/leviathan-pbr.glb.wasm",leve:"modelos/leviathan-pbr-1k.glb.wasm",
+"leviathan":{titulo:"Leviathan",sub:"8 peças de impressão · cores do render",zoom:.86,glb:"modelos/leviathan-pbr.glb.wasm",leve:"modelos/leviathan-pbr-1k.glb.wasm",efeitos:"modelos/leviathan-efeitos.js",pos:true,bloom:[.8,.25,1],ao:false,
  luz:{mapa:"modelos/leviathan-pbr-luz.jpg",mapaLeve:"modelos/leviathan-pbr-1k-luz.jpg",curva:"modelos/leviathan-pbr-curva.jpg",curvaLeve:"modelos/leviathan-pbr-1k-curva.jpg",reflexo:"modelos/leviathan-pbr-reflexo.jpg",reflexoLeve:"modelos/leviathan-pbr-1k-reflexo.jpg",max:2.2339,rmax:0.4000,mapaSolo:"modelos/leviathan-pbr-luz-solo.jpg",mapaSoloLeve:"modelos/leviathan-pbr-1k-luz-solo.jpg",curvaSolo:"modelos/leviathan-pbr-curva-solo.jpg",curvaSoloLeve:"modelos/leviathan-pbr-1k-curva-solo.jpg",reflexoSolo:"modelos/leviathan-pbr-reflexo-solo.jpg",reflexoSoloLeve:"modelos/leviathan-pbr-1k-reflexo-solo.jpg",maxSolo:2.2583,rmaxSolo:0.4468,
   chao:"modelos/leviathan-pbr-chao.jpg",cx:0.0000,cz:0.0000,raio:4.2},
  montagem:{passo:.6,dur:1.15,ordem:["base","pe-direito","perna-esquerda","torso","garra-caranguejo-direita","braco-esquerdo","peixe-espada-esquerdo","cabeca-tentaculos"],
@@ -508,7 +508,7 @@ let raf=0,lastT=0,slow=0,holder=null,mats=[],tris=0,radius=1,tgt=new THREE.Vecto
 const PROF=new THREE.MeshBasicMaterial({colorWrite:false});
 // pós-processamento dos modelos com cfg.pos: cena em HDR com MSAA, oclusão de ambiente (GTAO, só no computador),
 // bloom (começa em meia resolução) e saída com tom filmic. Fica fora em malha, normais e ray tracing.
-let POS=null,posOn=false;const PELOS=[];
+let POS=null,posOn=false,posCfg=null;const PELOS=[];
 // renderizador por software (SwiftShader): não desenha em alvo HDR com MSAA, então fica sem
 const SOFT=(()=>{try{const gl=renderer.getContext(),e=gl.getExtension("WEBGL_debug_renderer_info");return /swiftshader|llvmpipe|software/i.test(e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):"")}catch(_){return false}})();
 async function posPrepara(){if(POS)return POS;const fino=!IOS&&!weak;
@@ -649,7 +649,7 @@ if(fade.on){fade.t+=dt;const x=Math.min(1,fade.t/FADE_DUR);PS.uFade.value=eo(x);
 if(mixer&&!(mont&&mont.ativo)&&!usaRT())mixer.update(dt);   // com ray tracing a pose fica parada (o traçador usa a pose do momento em que ligou)
 if(fx)fx.tick(dt,t/1000);
 if(usaRT()){RT.pt.renderSample();if(fx&&fx.grupo&&fx.grupo.visible){   // fogo e fumaça por cima, cortados pela profundidade do modelo
- const ac=renderer.autoClear,bg=scene.background;renderer.autoClear=false;renderer.clearDepth();fx.grupo.visible=false;scene.background=null;scene.overrideMaterial=PROF;renderer.render(scene,camera);scene.overrideMaterial=null;scene.background=bg;fx.grupo.visible=true;renderer.render(fx.grupo,camera);renderer.autoClear=ac}mais=RT.pt.samples<MAXS;if(((t/400)|0)!==((lastT/400)|0))info()}else if(usaPos()){if(POS.ao)POS.ao.enabled=PS.uJit.value<.5;POS.comp.render(dt)}else renderer.render(scene,camera);   // com o tremor PS1 a oclusão sai (a passada dela não treme junto)
+ const ac=renderer.autoClear,bg=scene.background;renderer.autoClear=false;renderer.clearDepth();fx.grupo.visible=false;scene.background=null;scene.overrideMaterial=PROF;renderer.render(scene,camera);scene.overrideMaterial=null;scene.background=bg;fx.grupo.visible=true;renderer.render(fx.grupo,camera);renderer.autoClear=ac}mais=RT.pt.samples<MAXS;if(((t/400)|0)!==((lastT/400)|0))info()}else if(usaPos()){if(POS.ao)POS.ao.enabled=PS.uJit.value<.5&&!(posCfg&&posCfg.ao===false);POS.comp.render(dt)}else renderer.render(scene,camera);   // com o tremor PS1 a oclusão sai (a passada dela não treme junto)
 // qualidade adaptativa: se o aparelho passar de ~30 ms por quadro, reduz a resolução
 if(lastT&&t-lastT<250&&!usaRT()){if(t-lastT>34){if(++slow>=24&&pr>1){pr=Math.max(1,pr-.5);renderer.setPixelRatio(pr);size();info();slow=0}}else slow=Math.max(0,slow-1)}
 lastT=t;if(controls.autoRotate||mais||(mont&&mont.ativo)||vp||fx)request()}
@@ -718,7 +718,7 @@ key.castShadow=!!cfg.sombra;if(cfg.sombra){const S=IOS||weak?1024:2048;key.shado
  key.shadow.bias=-.0004;key.shadow.normalBias=.003;key.shadow.radius=3;
  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}})}
 PELOS.length=0;if(cfg.peloExtra&&!IOS&&!weak)peloCamada(root);
-posOn=!!cfg.pos;if(posOn)posPrepara().then(()=>{if(meu===seq){size();request()}});
+posOn=!!cfg.pos;posCfg=cfg;if(posOn)posPrepara().then(P=>{if(meu!==seq)return;const b=cfg.bloom||[.8,.35,.72];P.bloom.strength=b[0];P.bloom.radius=b[1];P.bloom.threshold=b[2];size();request()});   // bloom por modelo: [força, raio, limiar]
 if(norm)normAplica();
 size();frameCam();
 if(mont)montFim();   // começa montado; a montagem agora é o fade in pelo botão
