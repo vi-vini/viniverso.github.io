@@ -249,7 +249,7 @@ section h2.gt{color:var(--ink);-webkit-text-stroke:0;font:800 clamp(28px,7.5vw,6
 <div class="vstatus" id="vstatus" role="status" aria-live="polite" hidden></div>
 <p class="vhint" id="vhint" hidden>Arraste para girar. Dois dedos: pince para aproximar, arraste para mover.</p>
 <p class="vinfo" id="vinfo"></p>
-<div class="vtools"><button id="vrot" type="button" aria-pressed="true">Girar sozinho</button><button id="vrt" type="button" aria-pressed="false" hidden>Ray tracing</button><button id="vwire" type="button" aria-pressed="false">Ver malha</button><button id="vnorm" type="button" aria-pressed="false">Ver normais</button><button id="vps1" type="button" aria-pressed="true">Tremor PS1</button><button id="vpecas" type="button" hidden>Ver peças</button><button id="vmontar" type="button" hidden>Montar de novo</button><button id="vextra" type="button" aria-pressed="true" hidden>Ocultar bracinhos</button><button id="vreset" type="button">Centralizar</button></div>
+<div class="vtools"><button id="vrot" type="button" aria-pressed="true">Girar sozinho</button><button id="vrt" type="button" aria-pressed="false" hidden>Ray tracing</button><button id="vup" type="button" aria-pressed="true" hidden>Upscaling</button><button id="vwire" type="button" aria-pressed="false">Ver malha</button><button id="vnorm" type="button" aria-pressed="false">Ver normais</button><button id="vps1" type="button" aria-pressed="true">Tremor PS1</button><button id="vpecas" type="button" hidden>Ver peças</button><button id="vmontar" type="button" hidden>Montar de novo</button><button id="vextra" type="button" aria-pressed="true" hidden>Ocultar bracinhos</button><button id="vreset" type="button">Centralizar</button></div>
 </main>
 
 <main id="imerso" hidden aria-label="Visualização imersiva">
@@ -342,7 +342,7 @@ const MODELS={
 "felipe-clara":{titulo:"Felipe e Clara Camarão",sub:"As Cartas · capa do TCC · PLA cor cobre",glb:"modelos/felipe-clara-pbr.glb.wasm",leve:"modelos/felipe-clara-pbr-1k.glb.wasm",
  luz:{mapa:"modelos/felipe-clara-pbr-luz.jpg",mapaLeve:"modelos/felipe-clara-pbr-1k-luz.jpg",curva:"modelos/felipe-clara-pbr-curva.jpg",curvaLeve:"modelos/felipe-clara-pbr-1k-curva.jpg",reflexo:"modelos/felipe-clara-pbr-reflexo.jpg",reflexoLeve:"modelos/felipe-clara-pbr-1k-reflexo.jpg",max:2.1882,rmax:0.1856,chao:"modelos/felipe-clara-pbr-chao.jpg",cx:-0.0864,cz:-0.0231,raio:4.2},
  material:"pla-cobre",rt:true,escalaImersa:1.9},
-"fury":{titulo:"The Fury",sub:"Personagem para jogos · PBR 4K · fogo e fumaça em tempo real",zoom:.86,glb:"modelos/fury-pbr.glb.wasm",leve:"modelos/fury-pbr-1k.glb.wasm",efeitos:"modelos/fury-efeitos.js",escalaImersa:3.4,distImersa:1.7,idle:true,camera:{az:0,el:3,zoom:1,mira:.5},
+"fury":{titulo:"The Fury",sub:"Personagem para jogos · PBR 4K · fogo e fumaça em tempo real",zoom:.86,glb:"modelos/fury-pbr.glb.wasm",leve:"modelos/fury-pbr-1k.glb.wasm",efeitos:"modelos/fury-efeitos.js",rtExtra:true,escalaImersa:3.4,distImersa:1.7,idle:true,camera:{az:0,el:3,zoom:1,mira:.5},
  alternar:{peca:"bracos-demonio",rotulo:"bracinhos"},montagem:{grupos:true,passo:.55,dur:1.1,alcance:.36,altura:.24,incremento:.02,ordem:["pernas","tanga","capa","cinto","peitoral","braco-direito","braco-esquerdo","machados","bracos-demonio","capacete"],
   nomes:{"pernas":"pernas e cascos","tanga":"tanga","capa":"capa e cauda","cinto":"cinto e abdômen","peitoral":"peitoral e ombreiras","braco-direito":"braço direito","braco-esquerdo":"braço esquerdo","machados":"machados","bracos-demonio":"braços demoníacos","capacete":"capacete em chamas"}}},
 "cubo-teste":{titulo:"Cubo de teste",sub:"Duplo virtual de demonstração",glb:"modelos/cubo-teste.glb.wasm"}
@@ -505,21 +505,46 @@ const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMate
 shadow.rotation.x=-Math.PI/2;shadow.position.y=.002;scene.add(shadow);
 let raf=0,lastT=0,slow=0,holder=null,mats=[],tris=0,radius=1,tgt=new THREE.Vector3(),wire=false,dims=new THREE.Vector3(1,1,1),zoomCfg=0,camCfg=null,mixer=null;
 // ray tracing (three-gpu-pathtracer): só é baixado quando um modelo pede. Enquanto a câmera se move, mostra a versão rápida.
-let RT=null,rtCfg=false,rtOn=false,EST=null,luzCfg=false,decal=null;const btnRT=$("#vrt"),MAXS=weak?160:600,DN=weak?48:96;
+const PROF=new THREE.MeshBasicMaterial({colorWrite:false});let ENVPT=null,RT=null,rtCfg=false,rtExtra=false,rtUp=true,rtOn=false,EST=null,luzCfg=false,decal=null;const btnRT=$("#vrt"),MAXS=weak?160:600,DN=weak?48:96;
 async function rtSetup(){if(RT)return RT;const PT=await import("three-gpu-pathtracer");const pt=new PT.WebGLPathTracer(renderer);
  pt.tiles.set(weak?3:2,weak?3:2);pt.minSamples=weak?2:3;pt.renderDelay=120;pt.fadeDuration=350;pt.bounces=weak?3:4;pt.filterGlossyFactor=.5;
  pt.textureSize.set(weak?1024:2048,weak?1024:2048);
  // remove o ruído das primeiras amostras com um filtro que preserva bordas; some aos poucos conforme as amostras acumulam
- const dn=new PT.DenoiseMaterial({map:null,transparent:true,premultipliedAlpha:renderer.getContextAttributes().premultipliedAlpha});
- pt.renderToCanvasCallback=(target,r,quad)=>{const ac=r.autoClear;r.autoClear=false;const n=pt.samples;
-  if(n<DN){const q=quad.material;dn.map=target.texture;dn.opacity=q.opacity;dn.blending=q.blending;dn.uniforms.sigma.value=Math.max(.6,3.2*(1-n/DN));dn.uniforms.kSigma.value=1.4;dn.uniforms.threshold.value=.12;quad.material=dn;quad.render(r);quad.material=q}
-  else quad.render(r);r.autoClear=ac};
+ const pa=renderer.getContextAttributes().premultipliedAlpha;
+ const dn=new PT.DenoiseMaterial({map:null,transparent:true,premultipliedAlpha:pa});
+ // upscaling: o traçador roda em 1/4 dos pixels; a imagem sobe para a tela com interpolação e um filtro de nitidez
+ // adaptativo (cada pixel fica preso entre o mínimo e o máximo dos vizinhos, sem halo). Não é DLSS: o navegador não
+ // tem acesso aos núcleos de IA da placa, então a reconstrução é feita por shader.
+ const dnRT=new PT.DenoiseMaterial({map:null,transparent:false,premultipliedAlpha:false}),tmp=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType});
+ const nit=new THREE.ShaderMaterial({uniforms:{map:{value:null},texel:{value:new THREE.Vector2(1,1)},forca:{value:.55},opacity:{value:1}},transparent:true,premultipliedAlpha:pa,depthTest:false,depthWrite:false,
+  vertexShader:"varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}",
+  fragmentShader:`uniform sampler2D map;uniform vec2 texel;uniform float forca,opacity;varying vec2 vUv;
+void main(){vec4 c=texture2D(map,vUv);vec3 a=texture2D(map,vUv-vec2(0.,texel.y)).rgb,b=texture2D(map,vUv-vec2(texel.x,0.)).rgb,d=texture2D(map,vUv+vec2(texel.x,0.)).rgb,e=texture2D(map,vUv+vec2(0.,texel.y)).rgb;
+vec3 mn=min(c.rgb,min(min(a,b),min(d,e))),mx=max(c.rgb,max(max(a,b),max(d,e)));
+gl_FragColor=vec4(clamp(c.rgb+forca*(4.*c.rgb-a-b-d-e),mn,mx),c.a*opacity);
+#include <tonemapping_fragment>
+#include <colorspace_fragment>
+#include <premultiplied_alpha_fragment>
+}`});
+ const dnAjusta=(m,n)=>{m.uniforms.sigma.value=n<DN?Math.max(.6,3.2*(1-n/DN)):.55;m.uniforms.kSigma.value=1.4;m.uniforms.threshold.value=.12};
+ pt.renderToCanvasCallback=(target,r,quad)=>{const ac=r.autoClear;r.autoClear=false;const n=pt.samples,q=quad.material;
+  if(rtUp){if(tmp.width!==target.width||tmp.height!==target.height)tmp.setSize(target.width,target.height);
+   const rt0=r.getRenderTarget();dnRT.map=target.texture;dnRT.opacity=1;dnRT.blending=THREE.NoBlending;dnAjusta(dnRT,n);r.setRenderTarget(tmp);quad.material=dnRT;quad.render(r);r.setRenderTarget(rt0);
+   nit.uniforms.forca.value=.55*Math.min(1,n/DN);nit.uniforms.map.value=tmp.texture;nit.uniforms.texel.value.set(1/tmp.width,1/tmp.height);nit.uniforms.opacity.value=q.opacity;nit.blending=q.blending;quad.material=nit;quad.render(r)}
+  else if(n<DN){dn.map=target.texture;dn.opacity=q.opacity;dn.blending=q.blending;dnAjusta(dn,n);quad.material=dn;quad.render(r)}
+  else quad.render(r);
+  quad.material=q;r.autoClear=ac};
  RT={pt,ready:false};return RT}
 function estudioLiga(){if(!EST){const floor=new THREE.Mesh(new THREE.CircleGeometry(40,96),new THREE.MeshStandardMaterial({color:0x2a0a08,roughness:.74,metalness:0}));floor.rotation.x=-Math.PI/2;scene.add(floor);EST={env:estudio(THREE),bg:fundo(THREE),floor}}
  scene.environment=EST.env;scene.environmentIntensity=1.3;scene.background=EST.bg;renderer.toneMappingExposure=1.2;key.visible=false;shadow.visible=false;EST.floor.visible=true}
 async function rtLiga(){const R=await rtSetup();if(!rtOn||!rtCfg)return;R.ready=false;info();await new Promise(r=>setTimeout(r,60));if(!rtOn||!rtCfg)return;
- R.pt.renderScale=Math.min(1,(weak?1:1.5)/pr);if(decal)decal.visible=false;const fm=EST&&EST.floor.material;if(fm)fm.roughness=.82;R.pt.setScene(scene,camera);if(fm)fm.roughness=.74;if(decal)decal.visible=true;R.ready=true;R.pt.updateCamera();info();request()}
+ R.pt.renderScale=rtEscala();if(rtExtra&&holder)holder.traverse(o=>{if(o.isMesh&&!(o.geometry.attributes.position.array instanceof Float32Array))o.geometry=floatGeo(THREE,o.geometry)});
+ const fg=fx&&fx.grupo,fv=fg&&fg.visible;if(fg)fg.visible=false;if(decal)decal.visible=false;const fm=EST&&EST.floor.material;if(fm)fm.roughness=.82;const env0=scene.environment;if(env0&&!(env0.image&&env0.image.data)){ENVPT=ENVPT||estudio(THREE);scene.environment=ENVPT}   // o traçador só aceita ambiente equiretangular com dados (o PMREM da sala não serve)
+ R.pt.setScene(scene,camera);scene.environment=env0;if(fm)fm.roughness=.74;if(decal)decal.visible=true;if(fg)fg.visible=fv;R.ready=true;R.pt.updateCamera();info();request()}
 const usaRT=()=>rtCfg&&rtOn&&!wire&&!norm&&RT&&RT.ready;
+const btnUp=$("#vup"),rtEscala=()=>Math.min(1,(weak?1:1.5)/pr)*(rtUp?.5:1);
+function rtUI(){btnUp.hidden=!(rtCfg&&rtOn);btnUp.setAttribute("aria-pressed",String(rtUp))}
+btnUp.onclick=()=>{rtUp=!rtUp;rtUI();if(RT&&RT.ready){RT.pt.renderScale=rtEscala();RT.pt.reset()}info();request()};
 // montagem animada das peças de impressão: cada peça entra voando, girando em torno do próprio centro, na ordem de encaixe
 let mont=null;const btnMont=$("#vmontar");
 // botão de mostrar/ocultar uma peça opcional do modelo (no Fury, os 18 bracinhos demoníacos)
@@ -572,7 +597,7 @@ float psB4(vec2 a){return psB2(0.5*a)*0.25+psB2(a);}`)
    .replace("void main() {","void main() {\n if(uFade<0.999){float h=(vPsY-uMinY)/(uMaxY-uMinY);if(h>uFade*1.3-0.3+(psB4(gl_FragCoord.xy)-0.5)*0.12)discard;}");
  };
  m.customProgramCacheKey=()=>chaveAntes+"|ps1";m.needsUpdate=true}
-function montInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false}fade.t=0;fade.on=true;PS.uFade.value=0;request()}
+function montInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false;rtUI()}fade.t=0;fade.on=true;PS.uFade.value=0;request()}
 function montFim(){if(!mont)return;mont.t=mont.fim;mont.ativo=false;montPose(mont);info()}
 const btnPs1=$("#vps1");btnPs1.onclick=()=>{const on=PS.uJit.value<.5;PS.uJit.value=on?1:0;btnPs1.setAttribute("aria-pressed",String(on));request()};
 let vp=null;const btnPecas=$("#vpecas"),_c=new THREE.Vector3();
@@ -581,10 +606,10 @@ function vpMostra(i){mont.pcs.forEach((p,k)=>{p.o.visible=k===i;const U=luzU(p.o
 function vpCam(){const a=vp.a0+2*Math.PI*((vp.t%vp.dur)/vp.dur),e=.3,v=THREE.MathUtils.degToRad(camera.fov),hf=2*Math.atan(Math.tan(v/2)*camera.aspect),d=vp.r/Math.sin(Math.min(v,hf)/2)*1.02;
  camera.position.set(vp.c.x+Math.sin(a)*Math.cos(e)*d,vp.c.y+Math.sin(e)*d,vp.c.z+Math.cos(a)*Math.cos(e)*d);camera.lookAt(vp.c);controls.target.copy(vp.c)}
 function vpSai(){if(!vp)return;vp=null;controls.enabled=true;btnPecas.textContent="Ver peças";if(decal)decal.visible=true;if(mont)mont.pcs.forEach(p=>{p.o.visible=true;const U=luzU(p.o);if(U)U.luzMix.value=1});frameCam()}
-function pecasInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false}montFim();
+function pecasInicia(){if(!mont)return;if(rtOn){rtOn=false;btnRT.setAttribute("aria-pressed","false");if(RT)RT.ready=false;rtUI()}montFim();
  vp={t:0,i:-1,n:mont.pcs.length,dur:4,a0:-.7,c:new THREE.Vector3(),r:1};controls.enabled=false;btnPecas.textContent="Pular";if(decal)decal.visible=false;vpMostra(0);vpCam();request()}
 const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-function info(){$("#vinfo").textContent=!holder?"":vp&&vp.i>=0?`Peça ${vp.i+1} de ${vp.n}: ${mont.pcs[vp.i].nome}`:mont&&mont.ativo?`Montando: ${(mont.atual||mont.pcs[0]).nome} · peça ${mont.pcs.indexOf(mont.atual||mont.pcs[0])+1} de ${mont.pcs.length}`:rtCfg&&rtOn&&!wire?(RT&&RT.ready?`Ray tracing · ${nf(RT.pt.samples|0)} amostras · ${nf(tris)} triângulos`:"Preparando o ray tracing…"):luzCfg?`Luz pré-calculada · ${nf(tris)} triângulos · ${pr}× de resolução`:`${nf(tris)} triângulos · ${renderer.capabilities.isWebGL2?"WebGL 2":"WebGL 1"} · ${pr}× de resolução`}
+function info(){$("#vinfo").textContent=!holder?"":vp&&vp.i>=0?`Peça ${vp.i+1} de ${vp.n}: ${mont.pcs[vp.i].nome}`:mont&&mont.ativo?`Montando: ${(mont.atual||mont.pcs[0]).nome} · peça ${mont.pcs.indexOf(mont.atual||mont.pcs[0])+1} de ${mont.pcs.length}`:rtCfg&&rtOn&&!wire?(RT&&RT.ready?`Ray tracing · ${nf(RT.pt.samples|0)} amostras · denoiser${rtUp?" · upscaling":""} · ${nf(tris)} triângulos`:"Preparando o ray tracing…"):luzCfg?`Luz pré-calculada · ${nf(tris)} triângulos · ${pr}× de resolução`:`${nf(tris)} triângulos · ${renderer.capabilities.isWebGL2?"WebGL 2":"WebGL 1"} · ${pr}× de resolução`}
 function size(){const r=host.getBoundingClientRect();if(r.width<2||r.height<2)return;renderer.setSize(Math.round(r.width),Math.round(r.height),false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();PS.uSnap.value.set(Math.max(40,Math.round(r.width/3)),Math.max(30,Math.round(r.height/3)));request()}
 function frameCam(){const v=THREE.MathUtils.degToRad(camera.fov),hf=2*Math.atan(Math.tan(v/2)*camera.aspect);
 const dist=camCfg?dims.y/2/Math.tan(v/2)/(camCfg.zoom||1)+dims.z/2   // camera: de frente, a altura do modelo enche a tela (a largura pode passar)
@@ -597,9 +622,10 @@ if(vp){vp.t+=dt;const i=Math.floor(vp.t/vp.dur);if(i>=vp.n){vpSai();montInicia()
 if(mont&&mont.ativo){mont.t+=dt;if(mont.t>=mont.fim)montFim();else{montPose(mont);if(((t/250)|0)!==((lastT/250)|0))info()}}
 if(extraObj&&extraOff&&!vp)extraObj.visible=false;
 if(fade.on){fade.t+=dt;const x=Math.min(1,fade.t/FADE_DUR);PS.uFade.value=eo(x);if(x>=1)fade.on=false;request()}
-if(mixer&&!(mont&&mont.ativo))mixer.update(dt);
+if(mixer&&!(mont&&mont.ativo)&&!usaRT())mixer.update(dt);   // com ray tracing a pose fica parada (o traçador usa a pose do momento em que ligou)
 if(fx)fx.tick(dt,t/1000);
-if(usaRT()){RT.pt.renderSample();mais=RT.pt.samples<MAXS;if(((t/400)|0)!==((lastT/400)|0))info()}else renderer.render(scene,camera);
+if(usaRT()){RT.pt.renderSample();if(fx&&fx.grupo&&fx.grupo.visible){   // fogo e fumaça por cima, cortados pela profundidade do modelo
+ const ac=renderer.autoClear,bg=scene.background;renderer.autoClear=false;renderer.clearDepth();fx.grupo.visible=false;scene.background=null;scene.overrideMaterial=PROF;renderer.render(scene,camera);scene.overrideMaterial=null;scene.background=bg;fx.grupo.visible=true;renderer.render(fx.grupo,camera);renderer.autoClear=ac}mais=RT.pt.samples<MAXS;if(((t/400)|0)!==((lastT/400)|0))info()}else renderer.render(scene,camera);
 // qualidade adaptativa: se o aparelho passar de ~30 ms por quadro, reduz a resolução
 if(lastT&&t-lastT<250&&!usaRT()){if(t-lastT>34){if(++slow>=24&&pr>1){pr=Math.max(1,pr-.5);renderer.setPixelRatio(pr);size();info();slow=0}}else slow=Math.max(0,slow-1)}
 lastT=t;if(controls.autoRotate||mais||(mont&&mont.ativo)||vp||fx)request()}
@@ -626,7 +652,7 @@ else if(o.userData.matOrig){o.material=o.userData.matOrig;delete o.userData.matO
 if(fx&&fx.ocultar)fx.ocultar(norm)}
 btnNorm.onclick=()=>{norm=!norm;btnNorm.setAttribute("aria-pressed",String(norm));normAplica();if(rtCfg&&RT&&RT.ready)RT.pt.reset();info();request()};
 btnWire.onclick=()=>{wire=!wire;btnWire.setAttribute("aria-pressed",String(wire));mats.forEach(m=>{m.wireframe=wire;const n=normDe.get(m);if(n)n.wireframe=wire});if(usaRT())RT.pt.reset();info();request()};
-btnRT.onclick=()=>{rtOn=!rtOn;btnRT.setAttribute("aria-pressed",String(rtOn));if(rtOn){vpSai();if(mont&&mont.ativo)montFim();if(controls.autoRotate)setRot(false);rtLiga()}else if(RT)RT.ready=false;info();request()};
+btnRT.onclick=()=>{rtOn=!rtOn;btnRT.setAttribute("aria-pressed",String(rtOn));rtUI();if(rtOn){vpSai();if(mont&&mont.ativo)montFim();if(controls.autoRotate)setRot(false);rtLiga()}else if(RT)RT.ready=false;info();request()};
 btnReset.onclick=()=>frameCam();
 btnMont.onclick=()=>{vpSai();montInicia()};
 btnPecas.onclick=()=>{if(vp){vpSai();montInicia()}else pecasInicia()};
@@ -651,8 +677,8 @@ root.traverse(o=>{if(o.isMesh&&!o.userData.decal){const gm=o.geometry;tris+=(gm.
 mats=[...set];holder=h;scene.add(h);
 shadow.scale.setScalar(Math.max(sz.x,sz.z)*k*2.6);
 radius=.5*Math.hypot(sz.x,sz.y,sz.z)*k;tgt.set(0,sz.y*k/2,0);dims.set(Math.max(sz.x,sz.z)*k*1.08,sz.y*k,Math.min(sz.x,sz.z)*k);zoomCfg=cfg.zoom||0;camCfg=cfg.camera||null;if(camCfg)tgt.y=sz.y*k*(camCfg.mira??.5);
-rtCfg=!!cfg.rt;btnRT.hidden=!rtCfg;host.classList.toggle("vrt-on",rtCfg);
-if(rtCfg||luzCfg)estudioLiga();
+rtExtra=!!cfg.rtExtra;rtCfg=!!cfg.rt||rtExtra;btnRT.hidden=!rtCfg;host.classList.toggle("vrt-on",rtCfg);rtUI();
+if(cfg.rt||luzCfg)estudioLiga();
 else{scene.environment=roomEnv;scene.environmentIntensity=cfg.ambiente??.7;scene.background=null;renderer.toneMappingExposure=cfg.exposicao??1;key.intensity=cfg.luzChave??.9;key.visible=true;shadow.visible=true;if(EST)EST.floor.visible=false}
 if(cfg.efeitos){try{const md=await import(new URL(cfg.efeitos,location.href).href);if(meu!==seq)return;fx=md.default({THREE,scene,root,camera,renderer,key,leve:weak||IOS})}catch(e){console.warn("efeitos:",e)}}
 mixer=cfg.idle?idleLiga(THREE,root,gltf.animations,h):null;

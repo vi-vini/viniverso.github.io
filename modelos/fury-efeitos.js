@@ -281,5 +281,5 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   // "Ver normais": esconde fogo, fumaça e halos e apaga as luzes de fogo
   let oculto = false;
   function ocultar(v) { oculto = !!v; grupo.visible = !oculto && (!(cap && pai !== cap) || cap.visible); luzes.visible = !oculto; }
-  return { tick, dispose, ocultar, P };
+  return { tick, dispose, ocultar, grupo, P };
 }
