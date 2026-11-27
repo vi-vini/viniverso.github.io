@@ -330,7 +330,7 @@ const MODELS={
  montagem:{passo:.60,dur:1.15,alcance:.30,altura:.21,incremento:.018,
   ordem:["pe-clara","BOLA-PE","saia","pernbola-a","BOLA-TRONCO","tronco","BOLA-BRACO1","braco-direito","BOLA-BRACO","mao-esquerda"],
   nomes:{"pe-clara":"pé e base","BOLA-PE":"encaixe do pé","saia":"saia e pernas","pernbola-a":"encaixe da perna","BOLA-TRONCO":"encaixe do tronco","tronco":"tronco e cocar","BOLA-BRACO1":"encaixe do braço 1","braco-direito":"braço direito","BOLA-BRACO":"encaixe do braço 2","mao-esquerda":"braço esquerdo e arco"}}},
-"leviathan":{titulo:"Leviathan",sub:"8 peças de impressão · cores do render",zoom:.86,glb:"modelos/leviathan-pbr.glb.wasm",leve:"modelos/leviathan-pbr-1k.glb.wasm",efeitos:"modelos/leviathan-efeitos.js",pos:true,bloom:[.8,.25,1],ao:false,
+"leviathan":{titulo:"Leviathan",sub:"8 peças de impressão · cores do render",zoom:.86,glb:"modelos/leviathan-pbr.glb.wasm",leve:"modelos/leviathan-pbr-1k.glb.wasm",pos:true,tom:"aces",sombra:true,luzChaveBake:.55,bloom:[.5,.3,.9],
  luz:{mapa:"modelos/leviathan-pbr-luz.jpg",mapaLeve:"modelos/leviathan-pbr-1k-luz.jpg",curva:"modelos/leviathan-pbr-curva.jpg",curvaLeve:"modelos/leviathan-pbr-1k-curva.jpg",reflexo:"modelos/leviathan-pbr-reflexo.jpg",reflexoLeve:"modelos/leviathan-pbr-1k-reflexo.jpg",max:2.2339,rmax:0.4000,mapaSolo:"modelos/leviathan-pbr-luz-solo.jpg",mapaSoloLeve:"modelos/leviathan-pbr-1k-luz-solo.jpg",curvaSolo:"modelos/leviathan-pbr-curva-solo.jpg",curvaSoloLeve:"modelos/leviathan-pbr-1k-curva-solo.jpg",reflexoSolo:"modelos/leviathan-pbr-reflexo-solo.jpg",reflexoSoloLeve:"modelos/leviathan-pbr-1k-reflexo-solo.jpg",maxSolo:2.2583,rmaxSolo:0.4468,
   chao:"modelos/leviathan-pbr-chao.jpg",cx:0.0000,cz:0.0000,raio:4.2},
  montagem:{passo:.6,dur:1.15,ordem:["base","pe-direito","perna-esquerda","torso","garra-caranguejo-direita","braco-esquerdo","peixe-espada-esquerdo","cabeca-tentaculos"],
@@ -712,7 +712,8 @@ extraCfg=cfg.alternar||null;extraObj=extraCfg?root.getObjectByName(extraCfg.peca
 mats.forEach(ps1Patch);fade.on=false;PS.uFade.value=1;
 renderer.toneMapping=cfg.tom==="aces"?THREE.ACESFilmicToneMapping:THREE.NeutralToneMapping;
 // sombra real da luz principal: o modelo faz sombra nele mesmo (placas, capa, machados)
-key.castShadow=!!cfg.sombra;if(cfg.sombra){const S=IOS||weak?1024:2048;key.shadow.mapSize.set(S,S);if(key.shadow.map){key.shadow.map.dispose();key.shadow.map=null}
+key.castShadow=!!cfg.sombra;if(cfg.sombra){if(luzCfg){key.visible=true;key.intensity=cfg.luzChaveBake??.5}   // com luz pré-calculada a chave fica fraca: serve para a sombra real e um recorte de luz direta
+ const S=IOS||weak?1024:2048;key.shadow.mapSize.set(S,S);if(key.shadow.map){key.shadow.map.dispose();key.shadow.map=null}
  const sc=key.shadow.camera,hb=new THREE.Box3().setFromObject(h,true),hs=hb.getSize(new THREE.Vector3()),hc=hb.getCenter(new THREE.Vector3()),R=.55*hs.length();
  sc.left=sc.bottom=-R;sc.right=sc.top=R;sc.near=.01;sc.far=20;sc.updateProjectionMatrix();key.target.position.copy(hc);if(!key.target.parent)scene.add(key.target);
  key.shadow.bias=-.0004;key.shadow.normalBias=.003;key.shadow.radius=3;
