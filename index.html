@@ -327,7 +327,7 @@ window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,"_blank")};
 $("#msg").onsubmit=e=>{e.preventDefault();window.open(`https://wa.me/${WA}?text=${encodeURIComponent("Olá, Vinícius! Sou "+$("#nm").value+". "+$("#tx").value)}`,"_blank")};
 /* MODELS: um item por modelo 3D. glb = arquivo .glb publicado junto da página. Aqui ele leva o sufixo .wasm só porque a hospedagem de artefatos não serve .glb; num domínio próprio use .glb puro. Prefira arquivos comprimidos com meshopt. */
 const MODELS={
-"escultura-cav":{titulo:"Escultura anatômica",sub:"Modelo digital · polipintura do ZBrush",glb:"modelos/escultura-cav.glb",leve:"modelos/escultura-cav-leve.glb",escalaImersa:1.95,camera:{az:-14,el:8,zoom:.86,mira:.50}},
+"escultura-cav":{titulo:"Escultura anatômica",sub:"Modelo digital · polipintura do ZBrush",zoom:.86,glb:"modelos/escultura-cav.glb.wasm",leve:"modelos/escultura-cav-leve.glb.wasm",rt:true,pos:true,tom:"aces",sombra:true,bloom:[.15,.3,1.6],escalaImersa:1.95,camera:{az:-14,el:8,zoom:.86,mira:.50}},
 "clara-camarao":{titulo:"Clara Camarão",sub:"10 peças de impressão · PLA vermelho acetinado",glb:"modelos/clara-camarao.glb",material:"pla-vermelho",rt:true,escalaImersa:1.9,
  montagem:{passo:.60,dur:1.15,alcance:.30,altura:.21,incremento:.018,
   ordem:["pe-clara","BOLA-PE","saia","pernbola-a","BOLA-TRONCO","tronco","BOLA-BRACO1","braco-direito","BOLA-BRACO","mao-esquerda"],
