@@ -244,10 +244,10 @@ section h2.gt{color:var(--ink);-webkit-text-stroke:0;font:800 clamp(28px,7.5vw,6
 </aside>
 
 <main id="viewer" hidden aria-label="Visualizador 3D">
-<canvas id="stage" tabindex="0" aria-label="Modelo 3D. Arraste para girar e use dois dedos para aproximar."></canvas>
+<canvas id="stage" tabindex="0" aria-label="Modelo 3D. Arraste para girar. Com dois dedos, pince para aproximar ou arraste para mover."></canvas>
 <div class="vbar"><a class="vback" href="#loja">← Loja</a><div class="vtitle"><b id="vt"></b><span id="vs"></span></div></div>
 <div class="vstatus" id="vstatus" role="status" aria-live="polite" hidden></div>
-<p class="vhint" id="vhint" hidden>Arraste para girar. Use dois dedos para aproximar.</p>
+<p class="vhint" id="vhint" hidden>Arraste para girar. Dois dedos: pince para aproximar, arraste para mover.</p>
 <p class="vinfo" id="vinfo"></p>
 <div class="vtools"><button id="vrot" type="button" aria-pressed="true">Girar sozinho</button><button id="vrt" type="button" aria-pressed="false" hidden>Ray tracing</button><button id="vwire" type="button" aria-pressed="false">Ver malha</button><button id="vnorm" type="button" aria-pressed="false">Ver normais</button><button id="vps1" type="button" aria-pressed="true">Tremor PS1</button><button id="vpecas" type="button" hidden>Ver peças</button><button id="vmontar" type="button" hidden>Montar de novo</button><button id="vextra" type="button" aria-pressed="true" hidden>Ocultar bracinhos</button><button id="vreset" type="button">Centralizar</button></div>
 </main>
@@ -491,7 +491,8 @@ roomEnv=pm.fromScene(room,.04).texture;scene.environment=roomEnv;scene.environme
 const key=new THREE.DirectionalLight(0xffffff,.9);key.position.set(2,3,2);scene.add(key);
 const camera=new THREE.PerspectiveCamera(35,1,.01,100);
 const controls=new OrbitControls(camera,canvas);
-controls.enableDamping=true;controls.dampingFactor=.09;controls.enablePan=false;controls.rotateSpeed=.85;controls.autoRotateSpeed=2.2;
+controls.enableDamping=true;controls.dampingFactor=.09;controls.enablePan=true;controls.screenSpacePanning=true;controls.panSpeed=.9;controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};   // dois dedos: pinça aproxima, arrastar sem pinçar move a câmera na vertical e na horizontal
+controls.rotateSpeed=.85;controls.autoRotateSpeed=2.2;
 const calm=matchMedia("(prefers-reduced-motion: reduce)").matches;
 controls.autoRotate=!calm;
 const btnRot=$("#vrot"),btnWire=$("#vwire"),btnReset=$("#vreset");
@@ -602,7 +603,9 @@ if(usaRT()){RT.pt.renderSample();mais=RT.pt.samples<MAXS;if(((t/400)|0)!==((last
 // qualidade adaptativa: se o aparelho passar de ~30 ms por quadro, reduz a resolução
 if(lastT&&t-lastT<250&&!usaRT()){if(t-lastT>34){if(++slow>=24&&pr>1){pr=Math.max(1,pr-.5);renderer.setPixelRatio(pr);size();info();slow=0}}else slow=Math.max(0,slow-1)}
 lastT=t;if(controls.autoRotate||mais||(mont&&mont.ativo)||vp||fx)request()}
-controls.addEventListener("change",()=>{if(usaRT())RT.pt.updateCamera();request()});
+// o arraste com dois dedos não deixa o modelo sair da tela: o alvo fica preso numa caixa em volta dele
+const _pmin=new THREE.Vector3(),_pmax=new THREE.Vector3();
+controls.addEventListener("change",()=>{if(!vp&&holder){_pmin.set(dims.x*.4,dims.y*.45,dims.x*.4);_pmax.copy(tgt).add(_pmin);_pmin.subVectors(tgt,_pmin);const a=controls.target.clone();controls.target.clamp(_pmin,_pmax);camera.position.add(controls.target.clone().sub(a))}if(usaRT())RT.pt.updateCamera();request()});
 new ResizeObserver(size).observe(host);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)request()});
 canvas.addEventListener("webglcontextlost",e=>{e.preventDefault();status("O aparelho pausou o gráfico 3D. Volte para esta tela para continuar.")});
