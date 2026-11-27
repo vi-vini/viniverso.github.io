@@ -8,23 +8,25 @@ export const P = {
   capacete: { x: -0.083, z: -0.07, base: 4.62, topo: 5.62, raio: 0.165 },
   nucleo: { de: 4.6, ate: 5.6, raio: 0.14, raioBase: 0.075, forca: 2.6 },
   bacia: { de: 4.62, ate: 4.98, raioBase: 0.16, raioTopo: 0.27, forca: 3.0 },
-  halo: [[0, 4.8, 0.3, 1.3, 0.5, true], [0, 5.66, 0, 0.9, 0.35, false]],
+  halo: [[0, 4.8, 0.3, 1.3, 0.3, true], [0, 5.66, 0, 0.9, 0.15, false]],   // fracos: o bloom do visualizador faz o resto
   chama: { altura: 0.45, largura: 0.2, y: -0.2 },
-  fumaca: { altura: 1.5, largura: 0.75, opacidade: 0.75 },
+  fumaca: { altura: 1.5, largura: 0.75, opacidade: 0.4 },
   luz: {
+    // como no vídeo do Unreal: ambiente baixo, chave lateral que faz sombra, recortes fortes atrás (frio à esquerda,
+    // quente à direita) e o fogo do capacete pintando peito e ombros
     fundo: 0x000000,
-    ambiente: 0.55,
-    chave: [0xf3f0ea, 1.1, [1.2, 2.2, 2.6]],
+    ambiente: 0.2,
+    chave: [0xf1ece4, 0.7, [1.6, 2.4, 2.0]],
     recortes: [
-      [0xa9c8ff, 0.9, [-2.5, 2.4, -2.2]],
-      [0xffd2b0, 0.6, [2.6, 1.6, -2.0]],
+      [0xa9c8ff, 3.0, [-2.5, 2.4, -2.2]],
+      [0xffc49a, 1.8, [2.6, 1.6, -2.0]],
     ],
-    hemi: [0x7fa6a8, 0x3a1a14, 0.6],
+    hemi: [0x7fa6a8, 0x2a1410, 0.15],
     fogo: [0xff4010, 0.06, [0, 4.82, 0.22]],
-    chamaLuz: [0xff7a28, 0.02, [0, 5.75, 0.05]],
+    chamaLuz: [0xff7a28, 0.03, [0, 5.75, 0.05]],
     dentro: [0xff8a30, 0.01, [0, 5.4, 0]],
-    colar: [0xff3c06, 0.13, [0, 4.74, 0]],
-    exposicao: 1.0,
+    colar: [0xff3c06, 0.2, [0, 4.74, 0]],
+    exposicao: 1.05,
   },
 };
 
@@ -126,6 +128,10 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   scene.environmentIntensity = L.ambiente;
   renderer.toneMappingExposure = L.exposicao;
   if (key) { key.color.setHex(L.chave[0]); key.intensity = L.chave[1]; key.position.set(...L.chave[2]); }
+  // luzes que o visualizador põe por conta própria (no iPhone, sem mapa de ambiente, ele acende uma hemisférica forte):
+  // ficam bem mais fracas para o Fury não perder o contraste da referência
+  const alheias = [];
+  for (const o of scene.children) if ((o.isHemisphereLight || o.isDirectionalLight) && o !== key) { alheias.push([o, o.intensity]); o.intensity *= 0.3; }
   for (const [cor, i, pos] of L.recortes) { const d = new THREE.DirectionalLight(cor, i); d.position.set(...pos); luzes.add(d); }
   luzes.add(new THREE.HemisphereLight(L.hemi[0], L.hemi[1], L.hemi[2]));
 
@@ -214,9 +220,12 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   // fumaça: cinza claro, base tingida pelo fogo, abre ao subir e some
   if (!leve || true) particulas({
     n: leve ? 14 : 26, origem: [C.x, C.topo - 0.02, C.z], vida: 3.2, subida: P.fumaca.altura, tam0: 0.22, tam1: P.fumaca.largura, espalha: 0.28, opac: P.fumaca.opacidade, ordem: 6,
+    // fumaça escura como na referência, acesa por baixo pelo fogo: o miolo denso absorve luz e as bordas finas brilham (espalhamento)
     frag: `float a = forma * smoothstep(0., .12, vVida) * (1. - smoothstep(.45, 1., vVida)) * (.55 + .6 * n);
-           vec3 c = mix(vec3(.5,.46,.44), vec3(.92,.88,.84), n);
-           c = mix(vec3(1.,.5,.2) * 1.4, c, smoothstep(.0, .3, vVida));
+           vec3 c = mix(vec3(.16,.15,.15), vec3(.42,.4,.39), n);
+           float calor = 1. - smoothstep(0., .55, vVida);
+           c += vec3(1.,.42,.12) * (.8*calor*calor*calor + .12*calor) * (1.2 - forma*.6);
+           c *= mix(1., .7, smoothstep(.5, 1., forma));
            gl_FragColor = vec4(c, a * opac);`,
   });
   // chama: línguas curtas, amarelo no começo, laranja e vermelho no fim, somadas à luz
@@ -227,6 +236,32 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
            c = mix(c, vec3(.7,.1,.02), smoothstep(.45,.9,vVida));
            gl_FragColor = vec4(c * a * 1.5, a);`,
   });
+
+  // brasas: fagulhas que sobem do capacete, giram e se apagam (o bloom do visualizador faz o brilho em volta)
+  {
+    const NB = leve ? 36 : 80, sd = new Float32Array(NB * 4);
+    for (let i = 0; i < NB * 4; i++) sd[i] = Math.random();
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(NB * 3), 3)); g.setAttribute("sd", new THREE.BufferAttribute(sd, 4));
+    const m = new THREE.ShaderMaterial({
+      uniforms: { t: { value: 0 }, tam: { value: 3.2 * Math.min(2, renderer.getPixelRatio()) } },
+      vertexShader: /* glsl */ `attribute vec4 sd; uniform float t, tam; varying float vA;
+        void main(){
+          float vel = .16 + .22 * sd.w, vida = fract(t * vel + sd.x), ciclo = floor(t * vel + sd.x);
+          float s = fract(sd.y + ciclo * .618), ang = s * 6.2831 + vida * (2. + 3. * sd.z);
+          float r = .06 + vida * (.18 + .4 * fract(s * 7.3));
+          vec3 p = vec3(${C.x.toFixed(3)} + cos(ang) * r, ${(C.topo - 0.25).toFixed(3)} + vida * (1.1 + 1.1 * sd.z), ${C.z.toFixed(3)} + sin(ang) * r);
+          vA = smoothstep(0., .06, vida) * (1. - smoothstep(.45, 1., vida)) * (.55 + .45 * sin(t * (14. + 20. * sd.w) + s * 40.));
+          vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv;
+          gl_PointSize = tam * (.5 + sd.z) / max(.2, -mv.z);
+        }`,
+      fragmentShader: /* glsl */ `varying float vA;
+        void main(){ float d = length(gl_PointCoord - .5); float g = smoothstep(.5, 0., d); g *= g;
+          gl_FragColor = vec4(vec3(1., .5, .14) * g * vA * 4., g * vA); }`,
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+    });
+    mats.push(m);
+    const brasas = new THREE.Points(g, m); brasas.frustumCulled = false; brasas.renderOrder = 9; grupo.add(brasas);
+  }
 
   // halos aditivos: imitam o bloom do Unreal em volta do colar e do topo
   for (const [hx, hy, hz, tam, forca, prof] of P.halo) {
@@ -275,6 +310,7 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
   function dispose() {
     if (grupo.parent) grupo.parent.remove(grupo); scene.remove(luzes);
     grupo.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
+    for (const [o, i] of alheias) o.intensity = i;
     if (!imersivo) scene.background = antes.bg; scene.environmentIntensity = antes.env; renderer.toneMappingExposure = antes.exp;
     if (key && antes.key) { key.color.setHex(antes.key[0]); key.intensity = antes.key[1]; key.position.copy(antes.key[2]); }
   }
