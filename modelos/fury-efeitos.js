@@ -267,7 +267,7 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
 
     function tick(dt, t) {
     for (const m of mats) m.uniforms.t.value = t;
-    if (cap && pai !== cap) grupo.visible = cap.visible;   // some junto com o capacete em "Ver peças"
+    grupo.visible = !oculto && (!(cap && pai !== cap) || cap.visible);   // some junto com o capacete em "Ver peças" e em "Ver normais"
     const f = 0.82 + 0.18 * Math.sin(t * 11.0) * Math.sin(t * 7.3 + 1.0) + 0.08 * Math.sin(t * 23.0);
     fogo.intensity = L.fogo[1] * f; fogo4.intensity = L.colar[1] * (0.8 + 0.2 * f); fogo2.intensity = L.chamaLuz[1] * (0.7 + 0.3 * f);
   }
@@ -278,5 +278,8 @@ export default function criar({ THREE, scene, root, camera, renderer, key, leve,
     if (!imersivo) scene.background = antes.bg; scene.environmentIntensity = antes.env; renderer.toneMappingExposure = antes.exp;
     if (key && antes.key) { key.color.setHex(antes.key[0]); key.intensity = antes.key[1]; key.position.copy(antes.key[2]); }
   }
-  return { tick, dispose, P };
+  // "Ver normais": esconde fogo, fumaça e halos e apaga as luzes de fogo
+  let oculto = false;
+  function ocultar(v) { oculto = !!v; grupo.visible = !oculto && (!(cap && pai !== cap) || cap.visible); luzes.visible = !oculto; }
+  return { tick, dispose, ocultar, P };
 }
