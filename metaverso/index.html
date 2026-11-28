@@ -1,0 +1,52 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Metaverso · Vinícius Fernandes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Hanken+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* Página do jogo Metaverso (build WebGL do Unity), com as cores e a tipografia do site */
+:root{--bg:#b41414;--ink:#fff;--acc:#ffa500;--dark:#1a0505;--wide:"Archivo","Arial Narrow",Arial,sans-serif;--text:"Hanken Grotesk",system-ui,sans-serif;color-scheme:light}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--dark);color:var(--ink);font:300 16px/1.45 var(--text);overflow:hidden}
+a{color:var(--acc);text-decoration:none;font-weight:600}
+.barra{position:fixed;left:0;right:0;top:0;z-index:3;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:calc(10px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:var(--bg)}
+.barra b{font:800 clamp(20px,5vw,30px)/1 var(--wide);font-stretch:125%;letter-spacing:-.02em;margin-right:auto}
+.bt{font:700 14px var(--wide);font-stretch:112%;color:var(--ink);background:var(--dark);border:2px solid var(--ink);padding:7px 12px;cursor:pointer}
+.bt:hover{background:var(--acc);color:var(--dark)}
+#palco{position:fixed;left:0;right:0;bottom:0;top:var(--topo,58px);background:#000}
+#unity-canvas{width:100%;height:100%;display:block;background:#000;outline:none}
+#carga{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:var(--dark)}
+#carga h1{margin:0;font:800 clamp(34px,9vw,72px)/.95 var(--wide);font-stretch:125%;letter-spacing:-.03em}
+#carga p{margin:0;max-width:46ch}
+.trilho{width:min(420px,80vw);height:14px;border:2px solid var(--ink)}
+.trilho i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+#erro{color:var(--acc);font-weight:600}
+</style></head><body>
+<header class="barra"><b>Metaverso</b><button class="bt" id="cheia" type="button">Tela cheia</button><a class="bt" href="../">← Site</a></header>
+<main id="palco">
+<canvas id="unity-canvas" tabindex="-1" aria-label="Jogo Metaverso"></canvas>
+<div id="carga" role="status" aria-live="polite">
+ <h1>METAVERSO</h1>
+ <p>Mundo virtual feito no Unity, aqui em versão para o navegador. Funciona melhor no computador, com teclado e mouse.</p>
+ <div class="trilho" aria-hidden="true"><i id="prog"></i></div>
+ <p id="pct">Carregando… 0%</p>
+ <p id="erro" hidden></p>
+</div>
+</main>
+<script>
+// a barra do topo define onde o jogo começa
+const topo=()=>document.documentElement.style.setProperty("--topo",document.querySelector(".barra").offsetHeight+"px");topo();addEventListener("resize",topo);
+const B="Build/",N="metaverso";
+const cfg={dataUrl:B+N+".data.unityweb",frameworkUrl:B+N+".framework.js.unityweb",codeUrl:B+N+".wasm.unityweb",streamingAssetsUrl:"StreamingAssets",
+ companyName:"Vinícius Fernandes",productName:"Metaverso",productVersion:"1.0",showBanner:(msg,tipo)=>{if(tipo==="error"){const e=document.getElementById("erro");e.hidden=false;e.textContent=msg}}};
+if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){const m=document.createElement("meta");m.name="viewport";m.content="width=device-width,height=device-height,initial-scale=1,shrink-to-fit=yes";document.head.appendChild(m);cfg.devicePixelRatio=1}
+const s=document.createElement("script");s.src=B+N+".loader.js";
+s.onload=()=>createUnityInstance(document.getElementById("unity-canvas"),cfg,p=>{const v=Math.round(p*100);document.getElementById("prog").style.width=v+"%";document.getElementById("pct").textContent="Carregando… "+v+"%"})
+ .then(u=>{window.unityInstance=u;document.getElementById("carga").hidden=true;document.getElementById("cheia").onclick=()=>u.SetFullscreen(1)})
+ .catch(e=>{const el=document.getElementById("erro");el.hidden=false;el.textContent="Não foi possível abrir o jogo neste navegador: "+e});
+s.onerror=()=>{const el=document.getElementById("erro");el.hidden=false;el.textContent="Os arquivos do jogo não foram encontrados."};
+document.body.appendChild(s);
+</script>
+</body></html>
